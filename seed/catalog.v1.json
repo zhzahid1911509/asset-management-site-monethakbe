@@ -1,0 +1,1598 @@
+{
+  "version": 1,
+  "status": "seed-specification-not-database-migration",
+  "categories": [
+    {
+      "code": "cash",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Cash, accounts & deposits",
+        "bn": "নগদ, হিসাব ও আমানত"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "investments",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Investments",
+        "bn": "বিনিয়োগ"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "property",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Real estate & land",
+        "bn": "স্থাবর সম্পত্তি ও জমি"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "vehicles",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Vehicles",
+        "bn": "যানবাহন"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "valuables",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Precious metals & valuables",
+        "bn": "মূল্যবান ধাতু ও সামগ্রী"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "business",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Business interests",
+        "bn": "ব্যবসায়িক স্বার্থ"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "benefits",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Insurance & long-term benefits",
+        "bn": "বীমা ও দীর্ঘমেয়াদি সুবিধা"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "liabilities",
+      "parentCode": null,
+      "kind": "liability",
+      "name": {
+        "en": "Liabilities",
+        "bn": "দায় ও ঋণ"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "household",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Household goods & equipment",
+        "bn": "গৃহস্থালি সামগ্রী ও সরঞ্জাম"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "digital",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Digital assets",
+        "bn": "ডিজিটাল সম্পদ"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "rights",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Intellectual property & rights",
+        "bn": "মেধাস্বত্ব ও চুক্তিগত অধিকার"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "rural",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Agricultural & rural assets",
+        "bn": "কৃষি ও গ্রামীণ সম্পদ"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "transfers",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Inheritance, gifts & transfers",
+        "bn": "উত্তরাধিকার, উপহার ও হস্তান্তর"
+      },
+      "seedVersion": 1
+    },
+    {
+      "code": "additional",
+      "parentCode": null,
+      "kind": "asset",
+      "name": {
+        "en": "Other assets",
+        "bn": "অন্যান্য সম্পদ"
+      },
+      "seedVersion": 1
+    }
+  ],
+  "types": [
+    {
+      "code": "cash.cash",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Cash holdings",
+        "bn": "নগদ অর্থ"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.savings-account",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Savings account",
+        "bn": "সঞ্চয়ী হিসাব"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.current-account",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Current account",
+        "bn": "চলতি হিসাব"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.salary-account",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Salary account",
+        "bn": "বেতন হিসাব"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.joint-account",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Joint account",
+        "bn": "যৌথ হিসাব"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.fixed-deposit",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Fixed or term deposit",
+        "bn": "স্থায়ী বা মেয়াদি আমানত"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.dps",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "DPS / recurring savings",
+        "bn": "ডিপিএস / কিস্তিভিত্তিক সঞ্চয়"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.savings-certificate",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Government savings certificate",
+        "bn": "সরকারি সঞ্চয়পত্র"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.treasury-bill",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Treasury bill",
+        "bn": "ট্রেজারি বিল"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.treasury-bond",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Treasury bond",
+        "bn": "ট্রেজারি বন্ড"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.foreign-currency",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Foreign currency account",
+        "bn": "বৈদেশিক মুদ্রার হিসাব"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.mobile-balance",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Mobile financial service balance",
+        "bn": "মোবাইল আর্থিক সেবার স্থিতি"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.ewallet",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "E-wallet",
+        "bn": "ই-ওয়ালেট"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "cash.other-account",
+      "categoryCode": "cash",
+      "kind": "asset",
+      "name": {
+        "en": "Other financial account",
+        "bn": "অন্যান্য আর্থিক হিসাব"
+      },
+      "formSchemaKey": "cash.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "investments.shares",
+      "categoryCode": "investments",
+      "kind": "asset",
+      "name": {
+        "en": "Listed shares",
+        "bn": "তালিকাভুক্ত শেয়ার"
+      },
+      "formSchemaKey": "investments.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "investments.mutual-fund",
+      "categoryCode": "investments",
+      "kind": "asset",
+      "name": {
+        "en": "Mutual fund",
+        "bn": "মিউচুয়াল ফান্ড"
+      },
+      "formSchemaKey": "investments.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "investments.etf",
+      "categoryCode": "investments",
+      "kind": "asset",
+      "name": {
+        "en": "ETF",
+        "bn": "ইটিএফ"
+      },
+      "formSchemaKey": "investments.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "investments.government-security",
+      "categoryCode": "investments",
+      "kind": "asset",
+      "name": {
+        "en": "Government security",
+        "bn": "সরকারি সিকিউরিটি"
+      },
+      "formSchemaKey": "investments.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "investments.corporate-bond",
+      "categoryCode": "investments",
+      "kind": "asset",
+      "name": {
+        "en": "Corporate bond",
+        "bn": "করপোরেট বন্ড"
+      },
+      "formSchemaKey": "investments.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "investments.brokerage",
+      "categoryCode": "investments",
+      "kind": "asset",
+      "name": {
+        "en": "Brokerage account",
+        "bn": "ব্রোকারেজ হিসাব"
+      },
+      "formSchemaKey": "investments.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "investments.certificate",
+      "categoryCode": "investments",
+      "kind": "asset",
+      "name": {
+        "en": "Investment certificate",
+        "bn": "বিনিয়োগ সনদ"
+      },
+      "formSchemaKey": "investments.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "investments.dividend-holding",
+      "categoryCode": "investments",
+      "kind": "asset",
+      "name": {
+        "en": "Dividend-generating holding",
+        "bn": "লভ্যাংশ প্রদানকারী বিনিয়োগ"
+      },
+      "formSchemaKey": "investments.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "investments.other",
+      "categoryCode": "investments",
+      "kind": "asset",
+      "name": {
+        "en": "Other lawful investment",
+        "bn": "অন্যান্য বৈধ বিনিয়োগ"
+      },
+      "formSchemaKey": "investments.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.apartment",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Apartment",
+        "bn": "ফ্ল্যাট"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.house",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "House",
+        "bn": "বাড়ি"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.residential-plot",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Residential plot",
+        "bn": "আবাসিক প্লট"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.agricultural-land",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Agricultural land",
+        "bn": "কৃষিজমি"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.commercial-land",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Commercial land",
+        "bn": "বাণিজ্যিক জমি"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.office",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Office",
+        "bn": "অফিস"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.shop",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Shop",
+        "bn": "দোকান"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.warehouse",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Warehouse",
+        "bn": "গুদাম"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.industrial",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Industrial property",
+        "bn": "শিল্পসম্পত্তি"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.rental",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Rental property",
+        "bn": "ভাড়া দেওয়া সম্পত্তি"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.vacant",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Vacant land",
+        "bn": "খালি জমি"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.inherited",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Inherited property",
+        "bn": "উত্তরাধিকারসূত্রে পাওয়া সম্পত্তি"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.joint",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Jointly owned property",
+        "bn": "যৌথ মালিকানাধীন সম্পত্তি"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.construction",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Property under construction",
+        "bn": "নির্মাণাধীন সম্পত্তি"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "property.mortgaged",
+      "categoryCode": "property",
+      "kind": "asset",
+      "name": {
+        "en": "Mortgaged property",
+        "bn": "বন্ধকী সম্পত্তি"
+      },
+      "formSchemaKey": "property.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "vehicles.car",
+      "categoryCode": "vehicles",
+      "kind": "asset",
+      "name": {
+        "en": "Car",
+        "bn": "গাড়ি"
+      },
+      "formSchemaKey": "vehicles.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "vehicles.motorcycle",
+      "categoryCode": "vehicles",
+      "kind": "asset",
+      "name": {
+        "en": "Motorcycle",
+        "bn": "মোটরসাইকেল"
+      },
+      "formSchemaKey": "vehicles.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "vehicles.scooter",
+      "categoryCode": "vehicles",
+      "kind": "asset",
+      "name": {
+        "en": "Scooter",
+        "bn": "স্কুটার"
+      },
+      "formSchemaKey": "vehicles.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "vehicles.bicycle",
+      "categoryCode": "vehicles",
+      "kind": "asset",
+      "name": {
+        "en": "Bicycle",
+        "bn": "সাইকেল"
+      },
+      "formSchemaKey": "vehicles.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "vehicles.commercial",
+      "categoryCode": "vehicles",
+      "kind": "asset",
+      "name": {
+        "en": "Commercial vehicle",
+        "bn": "বাণিজ্যিক যান"
+      },
+      "formSchemaKey": "vehicles.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "vehicles.truck",
+      "categoryCode": "vehicles",
+      "kind": "asset",
+      "name": {
+        "en": "Truck",
+        "bn": "ট্রাক"
+      },
+      "formSchemaKey": "vehicles.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "vehicles.van",
+      "categoryCode": "vehicles",
+      "kind": "asset",
+      "name": {
+        "en": "Van",
+        "bn": "ভ্যান"
+      },
+      "formSchemaKey": "vehicles.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "vehicles.boat",
+      "categoryCode": "vehicles",
+      "kind": "asset",
+      "name": {
+        "en": "Boat",
+        "bn": "নৌযান"
+      },
+      "formSchemaKey": "vehicles.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "vehicles.other",
+      "categoryCode": "vehicles",
+      "kind": "asset",
+      "name": {
+        "en": "Other transportation",
+        "bn": "অন্যান্য যানবাহন"
+      },
+      "formSchemaKey": "vehicles.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.gold",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Gold",
+        "bn": "স্বর্ণ"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.silver",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Silver",
+        "bn": "রূপা"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.jewelry",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Jewelry",
+        "bn": "গয়না"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.gemstone",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Precious stones",
+        "bn": "রত্নপাথর"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.diamond",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Diamonds",
+        "bn": "হীরা"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.watch",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Watches",
+        "bn": "ঘড়ি"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.antique",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Antiques",
+        "bn": "পুরাকীর্তি"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.art",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Artwork",
+        "bn": "শিল্পকর্ম"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.collectible",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Collectibles",
+        "bn": "সংগ্রহযোগ্য সামগ্রী"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.coin",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Coins",
+        "bn": "মুদ্রা"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.stamp",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Stamps",
+        "bn": "ডাকটিকিট"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "valuables.luxury",
+      "categoryCode": "valuables",
+      "kind": "asset",
+      "name": {
+        "en": "Luxury goods",
+        "bn": "বিলাসপণ্য"
+      },
+      "formSchemaKey": "valuables.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "business.sole",
+      "categoryCode": "business",
+      "kind": "asset",
+      "name": {
+        "en": "Sole proprietorship",
+        "bn": "একক মালিকানার ব্যবসা"
+      },
+      "formSchemaKey": "business.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "business.partnership",
+      "categoryCode": "business",
+      "kind": "asset",
+      "name": {
+        "en": "Partnership",
+        "bn": "অংশীদারি ব্যবসা"
+      },
+      "formSchemaKey": "business.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "business.private-shares",
+      "categoryCode": "business",
+      "kind": "asset",
+      "name": {
+        "en": "Private-company shares",
+        "bn": "বেসরকারি কোম্পানির শেয়ার"
+      },
+      "formSchemaKey": "business.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "business.family",
+      "categoryCode": "business",
+      "kind": "asset",
+      "name": {
+        "en": "Family business",
+        "bn": "পারিবারিক ব্যবসা"
+      },
+      "formSchemaKey": "business.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "business.commercial",
+      "categoryCode": "business",
+      "kind": "asset",
+      "name": {
+        "en": "Commercial operation",
+        "bn": "বাণিজ্যিক কার্যক্রম"
+      },
+      "formSchemaKey": "business.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "business.agriculture",
+      "categoryCode": "business",
+      "kind": "asset",
+      "name": {
+        "en": "Agricultural enterprise",
+        "bn": "কৃষি উদ্যোগ"
+      },
+      "formSchemaKey": "business.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "business.other",
+      "categoryCode": "business",
+      "kind": "asset",
+      "name": {
+        "en": "Other business interest",
+        "bn": "অন্যান্য ব্যবসায়িক স্বার্থ"
+      },
+      "formSchemaKey": "business.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "benefits.life",
+      "categoryCode": "benefits",
+      "kind": "asset",
+      "name": {
+        "en": "Life insurance",
+        "bn": "জীবনবীমা"
+      },
+      "formSchemaKey": "benefits.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "benefits.health",
+      "categoryCode": "benefits",
+      "kind": "asset",
+      "name": {
+        "en": "Health insurance",
+        "bn": "স্বাস্থ্যবীমা"
+      },
+      "formSchemaKey": "benefits.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "benefits.property",
+      "categoryCode": "benefits",
+      "kind": "asset",
+      "name": {
+        "en": "Property insurance",
+        "bn": "সম্পত্তির বীমা"
+      },
+      "formSchemaKey": "benefits.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "benefits.vehicle",
+      "categoryCode": "benefits",
+      "kind": "asset",
+      "name": {
+        "en": "Vehicle insurance",
+        "bn": "যানবাহনের বীমা"
+      },
+      "formSchemaKey": "benefits.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "benefits.business",
+      "categoryCode": "benefits",
+      "kind": "asset",
+      "name": {
+        "en": "Business insurance",
+        "bn": "ব্যবসায়িক বীমা"
+      },
+      "formSchemaKey": "benefits.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "benefits.provident",
+      "categoryCode": "benefits",
+      "kind": "asset",
+      "name": {
+        "en": "Provident fund",
+        "bn": "ভবিষ্য তহবিল"
+      },
+      "formSchemaKey": "benefits.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "benefits.pension",
+      "categoryCode": "benefits",
+      "kind": "asset",
+      "name": {
+        "en": "Pension entitlement",
+        "bn": "পেনশন সুবিধা"
+      },
+      "formSchemaKey": "benefits.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "benefits.gratuity",
+      "categoryCode": "benefits",
+      "kind": "asset",
+      "name": {
+        "en": "Gratuity estimate",
+        "bn": "আনুমানিক আনুতোষিক"
+      },
+      "formSchemaKey": "benefits.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "benefits.retirement",
+      "categoryCode": "benefits",
+      "kind": "asset",
+      "name": {
+        "en": "Retirement scheme",
+        "bn": "অবসর সঞ্চয় প্রকল্প"
+      },
+      "formSchemaKey": "benefits.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "benefits.other",
+      "categoryCode": "benefits",
+      "kind": "asset",
+      "name": {
+        "en": "Other eligible benefit",
+        "bn": "অন্যান্য প্রযোজ্য সুবিধা"
+      },
+      "formSchemaKey": "benefits.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "liabilities.home",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Home loan",
+        "bn": "গৃহঋণ"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.land",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Land loan",
+        "bn": "জমি কেনার ঋণ"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.vehicle",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Vehicle loan",
+        "bn": "যানবাহনের ঋণ"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.personal",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Personal loan",
+        "bn": "ব্যক্তিগত ঋণ"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.business",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Business loan",
+        "bn": "ব্যবসায়িক ঋণ"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.card",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Credit card balance",
+        "bn": "ক্রেডিট কার্ডের বকেয়া"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.family",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Family loan payable",
+        "bn": "পরিবারের কাছে ঋণ"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.installment",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Installments",
+        "bn": "কিস্তি"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.bill",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Outstanding bills",
+        "bn": "বকেয়া বিল"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.property-dues",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Property dues",
+        "bn": "সম্পত্তি-সংক্রান্ত বকেয়া"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.tax",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Tax liability",
+        "bn": "কর দায়"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "liabilities.other",
+      "categoryCode": "liabilities",
+      "kind": "liability",
+      "name": {
+        "en": "Other obligation",
+        "bn": "অন্যান্য দায়"
+      },
+      "formSchemaKey": "liabilities.v1",
+      "defaultNetWorthInclusion": "recorded-outstanding-balance"
+    },
+    {
+      "code": "household.appliance",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Appliance",
+        "bn": "গৃহস্থালি যন্ত্রপাতি"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "household.computer",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Computer",
+        "bn": "কম্পিউটার"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "household.laptop",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Laptop",
+        "bn": "ল্যাপটপ"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "household.phone",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Phone",
+        "bn": "ফোন"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "household.tablet",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Tablet",
+        "bn": "ট্যাবলেট"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "household.camera",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Camera",
+        "bn": "ক্যামেরা"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "household.furniture",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Furniture",
+        "bn": "আসবাবপত্র"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "household.kitchen",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Kitchen equipment",
+        "bn": "রান্নাঘরের সরঞ্জাম"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "household.generator",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Generator",
+        "bn": "জেনারেটর"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "household.solar",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Solar system",
+        "bn": "সৌরবিদ্যুৎ ব্যবস্থা"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "household.other",
+      "categoryCode": "household",
+      "kind": "asset",
+      "name": {
+        "en": "Other household goods",
+        "bn": "অন্যান্য গৃহস্থালি সামগ্রী"
+      },
+      "formSchemaKey": "household.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "digital.domain",
+      "categoryCode": "digital",
+      "kind": "asset",
+      "name": {
+        "en": "Domain",
+        "bn": "ডোমেইন"
+      },
+      "formSchemaKey": "digital.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "digital.website",
+      "categoryCode": "digital",
+      "kind": "asset",
+      "name": {
+        "en": "Website",
+        "bn": "ওয়েবসাইট"
+      },
+      "formSchemaKey": "digital.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "digital.hosting",
+      "categoryCode": "digital",
+      "kind": "asset",
+      "name": {
+        "en": "Hosting",
+        "bn": "হোস্টিং"
+      },
+      "formSchemaKey": "digital.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "digital.license",
+      "categoryCode": "digital",
+      "kind": "asset",
+      "name": {
+        "en": "Software license",
+        "bn": "সফটওয়্যার লাইসেন্স"
+      },
+      "formSchemaKey": "digital.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "digital.subscription",
+      "categoryCode": "digital",
+      "kind": "asset",
+      "name": {
+        "en": "Digital subscription",
+        "bn": "ডিজিটাল সাবস্ক্রিপশন"
+      },
+      "formSchemaKey": "digital.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "digital.online-business",
+      "categoryCode": "digital",
+      "kind": "asset",
+      "name": {
+        "en": "Monetized online business",
+        "bn": "আয়কারী অনলাইন ব্যবসা"
+      },
+      "formSchemaKey": "digital.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "digital.other",
+      "categoryCode": "digital",
+      "kind": "asset",
+      "name": {
+        "en": "Other digital asset",
+        "bn": "অন্যান্য ডিজিটাল সম্পদ"
+      },
+      "formSchemaKey": "digital.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rights.copyright",
+      "categoryCode": "rights",
+      "kind": "asset",
+      "name": {
+        "en": "Copyright",
+        "bn": "কপিরাইট"
+      },
+      "formSchemaKey": "rights.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rights.patent",
+      "categoryCode": "rights",
+      "kind": "asset",
+      "name": {
+        "en": "Patent",
+        "bn": "পেটেন্ট"
+      },
+      "formSchemaKey": "rights.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rights.trademark",
+      "categoryCode": "rights",
+      "kind": "asset",
+      "name": {
+        "en": "Trademark",
+        "bn": "ট্রেডমার্ক"
+      },
+      "formSchemaKey": "rights.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rights.royalty",
+      "categoryCode": "rights",
+      "kind": "asset",
+      "name": {
+        "en": "Royalty",
+        "bn": "রয়্যালটি"
+      },
+      "formSchemaKey": "rights.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rights.license",
+      "categoryCode": "rights",
+      "kind": "asset",
+      "name": {
+        "en": "Licensing right",
+        "bn": "লাইসেন্স প্রদানের অধিকার"
+      },
+      "formSchemaKey": "rights.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rights.receivable",
+      "categoryCode": "rights",
+      "kind": "asset",
+      "name": {
+        "en": "Contractual receivable",
+        "bn": "চুক্তিগত পাওনা"
+      },
+      "formSchemaKey": "rights.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rights.other",
+      "categoryCode": "rights",
+      "kind": "asset",
+      "name": {
+        "en": "Other documented right",
+        "bn": "অন্যান্য নথিভুক্ত অধিকার"
+      },
+      "formSchemaKey": "rights.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rural.livestock",
+      "categoryCode": "rural",
+      "kind": "asset",
+      "name": {
+        "en": "Livestock",
+        "bn": "গবাদিপশু"
+      },
+      "formSchemaKey": "rural.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rural.poultry",
+      "categoryCode": "rural",
+      "kind": "asset",
+      "name": {
+        "en": "Poultry",
+        "bn": "হাঁস-মুরগি"
+      },
+      "formSchemaKey": "rural.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rural.fish",
+      "categoryCode": "rural",
+      "kind": "asset",
+      "name": {
+        "en": "Fish farm",
+        "bn": "মৎস্য খামার"
+      },
+      "formSchemaKey": "rural.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rural.orchard",
+      "categoryCode": "rural",
+      "kind": "asset",
+      "name": {
+        "en": "Orchard",
+        "bn": "ফলের বাগান"
+      },
+      "formSchemaKey": "rural.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rural.machinery",
+      "categoryCode": "rural",
+      "kind": "asset",
+      "name": {
+        "en": "Agricultural machinery",
+        "bn": "কৃষিযন্ত্র"
+      },
+      "formSchemaKey": "rural.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rural.irrigation",
+      "categoryCode": "rural",
+      "kind": "asset",
+      "name": {
+        "en": "Irrigation equipment",
+        "bn": "সেচ সরঞ্জাম"
+      },
+      "formSchemaKey": "rural.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rural.building",
+      "categoryCode": "rural",
+      "kind": "asset",
+      "name": {
+        "en": "Farm building",
+        "bn": "খামারের ভবন"
+      },
+      "formSchemaKey": "rural.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "rural.inventory",
+      "categoryCode": "rural",
+      "kind": "asset",
+      "name": {
+        "en": "Farm inventory",
+        "bn": "খামারের মজুত"
+      },
+      "formSchemaKey": "rural.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "transfers.gift",
+      "categoryCode": "transfers",
+      "kind": "asset",
+      "name": {
+        "en": "Gift",
+        "bn": "উপহার"
+      },
+      "formSchemaKey": "transfers.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "transfers.family",
+      "categoryCode": "transfers",
+      "kind": "asset",
+      "name": {
+        "en": "Family transfer",
+        "bn": "পারিবারিক হস্তান্তর"
+      },
+      "formSchemaKey": "transfers.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "transfers.undivided",
+      "categoryCode": "transfers",
+      "kind": "asset",
+      "name": {
+        "en": "Undivided inherited share",
+        "bn": "অবিভক্ত উত্তরাধিকার অংশ"
+      },
+      "formSchemaKey": "transfers.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "transfers.pending",
+      "categoryCode": "transfers",
+      "kind": "asset",
+      "name": {
+        "en": "Pending ownership transfer",
+        "bn": "অমীমাংসিত মালিকানা হস্তান্তর"
+      },
+      "formSchemaKey": "transfers.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "transfers.receivable",
+      "categoryCode": "transfers",
+      "kind": "asset",
+      "name": {
+        "en": "Estate receivable",
+        "bn": "উত্তরাধিকারসম্পত্তির পাওনা"
+      },
+      "formSchemaKey": "transfers.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "additional.receivable",
+      "categoryCode": "additional",
+      "kind": "asset",
+      "name": {
+        "en": "Money owed to the family",
+        "bn": "পরিবারের পাওনা অর্থ"
+      },
+      "formSchemaKey": "additional.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "additional.deposit",
+      "categoryCode": "additional",
+      "kind": "asset",
+      "name": {
+        "en": "Refundable deposit",
+        "bn": "ফেরতযোগ্য জামানত"
+      },
+      "formSchemaKey": "additional.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "additional.inventory",
+      "categoryCode": "additional",
+      "kind": "asset",
+      "name": {
+        "en": "Valuable inventory",
+        "bn": "মূল্যবান মজুত"
+      },
+      "formSchemaKey": "additional.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "additional.equipment",
+      "categoryCode": "additional",
+      "kind": "asset",
+      "name": {
+        "en": "Equipment",
+        "bn": "সরঞ্জাম"
+      },
+      "formSchemaKey": "additional.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    },
+    {
+      "code": "additional.custom",
+      "categoryCode": "additional",
+      "kind": "asset",
+      "name": {
+        "en": "Custom asset",
+        "bn": "নিজস্ব ধরনের সম্পদ"
+      },
+      "formSchemaKey": "additional.v1",
+      "defaultNetWorthInclusion": "requires-explicit-valuation"
+    }
+  ],
+  "rules": [
+    "One real-world asset is one record; alternative catalog labels do not create duplicate records.",
+    "Inherited, joint and mortgaged are also asset attributes; a property need not be duplicated across those types.",
+    "Land belongs to property; rural views may reference it.",
+    "Insurance coverage and subscription fees are not automatically included as asset values.",
+    "Estate liabilities use liability records and may link to an inheritance record.",
+    "Liability types are rendered in a separate module.",
+    "Form schema keys identify contracts to implement; no form schemas are included in this design package."
+  ]
+}

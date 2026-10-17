@@ -1,0 +1,56 @@
+{
+  "name": "monethakbe",
+  "version": "0.1.2",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "worker:email": "tsx scripts/email-worker.ts",
+    "dev:web": "next dev",
+    "email:status": "tsx scripts/email-status.ts"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "1.7.10",
+    "@hookform/resolvers": "5.9.1",
+    "@next/env": "16.4.2",
+    "@radix-ui/react-slot": "1.5.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "better-auth": "1.7.10",
+    "clsx": "2.1.1",
+    "decimal.js": "10.6.0",
+    "dotenv": "18.0.8",
+    "drizzle-orm": "0.45.4",
+    "lucide-react": "1.59.0",
+    "next": "16.4.2",
+    "pg": "8.23.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-hook-form": "7.90.0",
+    "tailwind-merge": "3.7.0",
+    "tailwindcss": "4.3.3",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.10",
+    "@types/node": "26.6.5",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "drizzle-kit": "0.31.11",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
+  },
+  "type": "module",
+  "overrides": {
+    "@esbuild-kit/core-utils": {
+      "esbuild": "0.25.12"
+    }
+  }
+}
