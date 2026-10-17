@@ -7,6 +7,12 @@ export class AppError extends Error {
   }
 }
 export const safeMessages: Record<string, string> = {
+  PAYMENT_DATE:
+    "Payment date must be on or after the recorded balance date and cannot be in the future.",
+  EMPTY_PAYMENT:
+    "Enter a principal, interest, or fee amount greater than zero.",
+  OVERPAYMENT:
+    "Principal exceeds the outstanding balance. Check the payment breakdown.",
   AUTH_REQUIRED: "Please sign in.",
   NOT_FOUND: "This record or workspace is unavailable.",
   FORBIDDEN: "You do not have permission for this action.",

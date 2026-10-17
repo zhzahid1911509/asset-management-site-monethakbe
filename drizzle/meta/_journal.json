@@ -8,6 +8,13 @@
       "when": 1792218562533,
       "tag": "0000_numerous_moonstone",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792255428918,
+      "tag": "0001_chilly_leper_queen",
+      "breakpoints": true
     }
   ]
 }

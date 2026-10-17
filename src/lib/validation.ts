@@ -56,3 +56,12 @@ export const role = z.enum([
   "read-only",
   "adviser",
 ]);
+
+export const paymentInput = z.object({
+  principal: money,
+  interest: money.default("0"),
+  fees: money.default("0"),
+  paidOn: date,
+  note: z.string().trim().max(1000).default(""),
+  version: z.number().int().positive(),
+});

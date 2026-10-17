@@ -13,7 +13,7 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 | Area             | Current behavior                                                                              | Next implementation work                                                                                               |
 | ---------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Money            | BDT only, exact decimals, manual whole-asset valuation and included economic share            | FX snapshots, verified market sources, historical ownership, rounding policies by currency                             |
-| Liabilities      | Initial outstanding balance only; name/notes editable; archive/restore                        | Payments, schedules, balance reconciliation and interest/fee separation                                                |
+| Liabilities      | Outstanding balance, principal/interest/fee payments, history; archive/restore                | Schedules, balance reconciliation and audited payment reversals                                                        |
 | Ownership        | One included family economic percentage                                                       | Co-owner parties, legal/beneficial distinctions and dated share histories                                              |
 | Permissions      | Fixed role defaults, explicit per-record allow/deny; owner-only invitations/grants/revocation | Custom roles, admin delegation, time-limited grants, transfer/recovery workflows                                       |
 | Membership       | One-time verified-email invitation, expiry, revocation                                        | Re-invitation/reactivation of revoked members and role changes                                                         |
@@ -46,6 +46,10 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 
 ## Next deliverable
 
-Extend the current foundation with category-specific asset forms, co-owners, liability repayment transactions and history, document metadata/storage, broader localization and browser tests. Preserve current permission checks and the exact-money contract. Add AI only through the planned server-side secret boundary; never use browser-stored keys.
+Continue with category-specific asset forms, co-owners, payment corrections/reconciliation, document metadata/storage, broader localization and browser tests. Preserve current permission checks and the exact-money contract. Add AI only through the planned server-side secret boundary; never use browser-stored keys.
 
 Version 0.1.1 starts the mail worker alongside Next.js with `npm run dev`. Production `npm start` still requires `npm run worker:email` separately. Permanent provider 4xx errors stop retries; HTTP 429 and 5xx can retry, respecting Retry-After. Worker logs classify errors without printing recipients, verification links or provider response bodies.
+
+## Version 0.2.0 finance increment
+
+Repayments and on-screen valuation/payment history are implemented end to end. Payment principal alone reduces the outstanding liability; interest and fees do not. Dates are chronological from the last recorded balance and cannot be in the future. Archived liabilities reject new payments. History is view-authorized and displays the latest 100 entries with an explicit limit notice. Payments cannot currently be edited/reversed; reconciliation and correction workflows remain pending. Current-record JSON exports include updated balances, but do not yet contain the payment ledger. No automatic bank transfers, amortization, bank reconciliation or interest accrual are implied.

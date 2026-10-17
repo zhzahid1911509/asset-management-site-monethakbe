@@ -12,6 +12,8 @@ import {
   uuid,
   role,
 } from "../lib/validation";
+import Decimal from "decimal.js";
+import { paymentInput } from "../lib/validation";
 import { totals } from "../lib/money";
 import { seal } from "./secrets";
 type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
@@ -273,46 +275,38 @@ export async function createRecord(
       })
       .returning();
     if (data.kind === "asset") {
-      await q
-        .insert(s.assets)
-        .values({
-          familyId,
-          recordId: r.id,
-          ownershipPercent: data.ownershipPercent,
-          location: data.location,
-        });
+      await q.insert(s.assets).values({
+        familyId,
+        recordId: r.id,
+        ownershipPercent: data.ownershipPercent,
+        location: data.location,
+      });
       if (data.amount !== undefined)
-        await q
-          .insert(s.valuations)
-          .values({
-            familyId,
-            recordId: r.id,
-            amount: data.amount,
-            asOf: data.asOf,
-            source: data.source,
-            createdBy: a.id,
-          });
-    } else
-      await q
-        .insert(s.liabilities)
-        .values({
+        await q.insert(s.valuations).values({
           familyId,
           recordId: r.id,
-          outstanding: data.amount!,
-          lender: data.lender,
-          balanceAsOf: data.asOf,
+          amount: data.amount,
+          asOf: data.asOf,
+          source: data.source,
+          createdBy: a.id,
         });
-    await q
-      .insert(s.recordGrants)
-      .values(
-        ["view", "edit"].map((action) => ({
-          familyId,
-          recordId: r.id,
-          membershipId: m.id,
-          action,
-          effect: "allow",
-        })),
-      );
+    } else
+      await q.insert(s.liabilities).values({
+        familyId,
+        recordId: r.id,
+        outstanding: data.amount!,
+        lender: data.lender,
+        balanceAsOf: data.asOf,
+      });
+    await q.insert(s.recordGrants).values(
+      ["view", "edit"].map((action) => ({
+        familyId,
+        recordId: r.id,
+        membershipId: m.id,
+        action,
+        effect: "allow",
+      })),
+    );
     await audit(q, familyId, a, "record.created", r.id);
     return { id: r.id };
   });
@@ -433,16 +427,14 @@ export async function addValuation(
         )
         .returning();
       if (!updated) throw new AppError("CONFLICT", 409);
-      await q
-        .insert(s.valuations)
-        .values({
-          familyId,
-          recordId: id,
-          amount: data.amount,
-          asOf: data.asOf,
-          source: data.source,
-          createdBy: a.id,
-        });
+      await q.insert(s.valuations).values({
+        familyId,
+        recordId: id,
+        amount: data.amount,
+        asOf: data.asOf,
+        source: data.source,
+        createdBy: a.id,
+      });
       await audit(q, familyId, a, "asset.valued", id);
       return { id };
     },
@@ -565,18 +557,16 @@ export async function inviteMember(
       .returning();
     const url = new URL("/invite", process.env.APP_ORIGIN);
     url.searchParams.set("token", token);
-    await q
-      .insert(s.emailJobs)
-      .values({
-        payload: seal(
-          JSON.stringify({
-            to: data.email,
-            subject: "Invitation to মনে থাকবে",
-            text: `You have been invited to a family workspace. Sign in with ${data.email}, then open this link within 48 hours: ${url.toString()}`,
-          }),
-          "email",
-        ),
-      });
+    await q.insert(s.emailJobs).values({
+      payload: seal(
+        JSON.stringify({
+          to: data.email,
+          subject: "Invitation to মনে থাকবে",
+          text: `You have been invited to a family workspace. Sign in with ${data.email}, then open this link within 48 hours: ${url.toString()}`,
+        }),
+        "email",
+      ),
+    });
     await audit(q, familyId, a, "member.invited");
     return { id: inv.id, status: "queued" };
   });
@@ -608,15 +598,13 @@ export async function acceptInvitation(db: Db, a: Actor, input: unknown) {
         ),
       );
     if (existing) throw new AppError("INVALID_INVITATION", 400);
-    await q
-      .insert(s.memberships)
-      .values({
-        familyId: inv.familyId,
-        userId: a.id,
-        role: inv.role,
-        expiresAt:
-          inv.role === "adviser" ? new Date(Date.now() + 30 * 86400_000) : null,
-      });
+    await q.insert(s.memberships).values({
+      familyId: inv.familyId,
+      userId: a.id,
+      role: inv.role,
+      expiresAt:
+        inv.role === "adviser" ? new Date(Date.now() + 30 * 86400_000) : null,
+    });
     await q
       .update(s.invitations)
       .set({ acceptedAt: new Date() })
@@ -666,4 +654,133 @@ export async function exportRecords(db: Db, familyId: string, a: Actor) {
       records: eligible,
     };
   });
+}
+
+export async function recordHistory(
+  db: Db,
+  familyId: string,
+  a: Actor,
+  id: string,
+) {
+  return db.transaction(async (q) => {
+    const { r } = await authorized(q, familyId, a, id, "view");
+    const valuations =
+      r.kind === "asset"
+        ? await q
+            .select()
+            .from(s.valuations)
+            .where(
+              and(
+                eq(s.valuations.familyId, familyId),
+                eq(s.valuations.recordId, id),
+              ),
+            )
+            .orderBy(
+              desc(s.valuations.asOf),
+              desc(s.valuations.createdAt),
+              desc(s.valuations.id),
+            )
+            .limit(101)
+        : [];
+    const payments =
+      r.kind === "liability"
+        ? await q
+            .select()
+            .from(s.liabilityPayments)
+            .where(
+              and(
+                eq(s.liabilityPayments.familyId, familyId),
+                eq(s.liabilityPayments.recordId, id),
+              ),
+            )
+            .orderBy(
+              desc(s.liabilityPayments.paidOn),
+              desc(s.liabilityPayments.createdAt),
+              desc(s.liabilityPayments.id),
+            )
+            .limit(101)
+        : [];
+    return {
+      valuations: valuations.slice(0, 100),
+      payments: payments.slice(0, 100),
+      hasMore: valuations.length > 100 || payments.length > 100,
+    };
+  });
+}
+export async function addPayment(
+  db: Db,
+  familyId: string,
+  a: Actor,
+  id: string,
+  input: unknown,
+  key: string,
+) {
+  const data = paymentInput.parse(input);
+  if (data.paidOn > today()) throw new AppError("PAYMENT_DATE");
+  if (new Decimal(data.principal).plus(data.interest).plus(data.fees).isZero())
+    throw new AppError("EMPTY_PAYMENT");
+  return mutate(
+    db,
+    familyId,
+    a,
+    key,
+    { action: "payment", id, data },
+    async (q) => {
+      const { r } = await authorized(q, familyId, a, id, "edit");
+      if (r.kind !== "liability") throw new AppError("INVALID_TYPE");
+      // Lock/version the parent first, consistently with all other record mutations.
+      const [updated] = await q
+        .update(s.records)
+        .set({ version: sql`${s.records.version}+1`, updatedAt: new Date() })
+        .where(
+          and(
+            eq(s.records.familyId, familyId),
+            eq(s.records.id, id),
+            eq(s.records.version, data.version),
+            eq(s.records.archived, false),
+          ),
+        )
+        .returning();
+      if (!updated) throw new AppError("CONFLICT", 409);
+      const [balance] = await q
+        .select()
+        .from(s.liabilities)
+        .where(
+          and(
+            eq(s.liabilities.familyId, familyId),
+            eq(s.liabilities.recordId, id),
+          ),
+        )
+        .for("update");
+      if (!balance) throw new AppError("INVALID_TYPE");
+      if (data.paidOn < balance.balanceAsOf) throw new AppError("PAYMENT_DATE");
+      const after = new Decimal(balance.outstanding).minus(data.principal);
+      if (after.isNegative()) throw new AppError("OVERPAYMENT");
+      await q
+        .insert(s.liabilityPayments)
+        .values({
+          familyId,
+          recordId: id,
+          principal: data.principal,
+          interest: data.interest,
+          fees: data.fees,
+          paidOn: data.paidOn,
+          note: data.note,
+          balanceBefore: balance.outstanding,
+          balanceAfter: after.toFixed(2),
+          createdBy: a.id,
+        });
+      await q
+        .update(s.liabilities)
+        .set({ outstanding: after.toFixed(2), balanceAsOf: data.paidOn })
+        .where(
+          and(
+            eq(s.liabilities.familyId, familyId),
+            eq(s.liabilities.recordId, id),
+          ),
+        );
+      await audit(q, familyId, a, "liability.payment.recorded", id);
+      return { id };
+    },
+  );
 }

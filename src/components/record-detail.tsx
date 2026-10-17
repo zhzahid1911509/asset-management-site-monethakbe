@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import type { snapshot } from "@/server/service";
 import { api, errorText } from "@/lib/client";
 import { formatMoney } from "@/lib/money";
+import { RecordHistory } from "./record-history";
 import { Button } from "./button";
 type Row = Awaited<ReturnType<typeof snapshot>>["records"][number];
 export function RecordDetail({
@@ -25,7 +26,7 @@ export function RecordDetail({
     [members, setMembers] = useState<
       { id: string; name: string; role: string }[]
     >([]);
-  const key = useRef(crypto.randomUUID());
+  const request = useRef({ fingerprint: "", key: crypto.randomUUID() });
   const bn = locale === "bn";
   useEffect(() => {
     if (role === "owner")
@@ -38,13 +39,17 @@ export function RecordDetail({
   async function send(path: string, data: unknown, method = "POST") {
     setBusy(true);
     setError("");
+    const fingerprint = JSON.stringify({ path, data, method });
+    if (request.current.fingerprint !== fingerprint)
+      request.current = { fingerprint, key: crypto.randomUUID() };
     try {
       await api(
         `families/${familyId}/records/${r.id}${path}`,
         method,
         data,
-        key.current,
+        request.current.key,
       );
+      request.current = { fingerprint: "", key: crypto.randomUUID() };
       onSaved();
     } catch (e) {
       setError(errorText(e));
@@ -182,6 +187,70 @@ export function RecordDetail({
               </Button>
             </form>
           )}
+          {r.kind === "liability" && !r.archived && (
+            <form
+              className="section-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const f = new FormData(e.currentTarget);
+                void send("/payments", {
+                  principal: f.get("principal"),
+                  interest: f.get("interest"),
+                  fees: f.get("fees"),
+                  paidOn: f.get("paidOn"),
+                  note: f.get("note"),
+                  version: r.version,
+                });
+              }}
+            >
+              <h3>{bn ? "পরিশোধ নথিভুক্ত করুন" : "Record a repayment"}</h3>
+              <p className="muted">
+                {bn
+                  ? "শুধু মূলধন বকেয়া কমায়। সুদ ও ফি আলাদা খরচ। এটি ব্যাংকে টাকা পাঠায় না।"
+                  : "Only principal reduces the balance. Interest and fees are separate costs. This records a payment; it does not transfer money."}
+              </p>
+              <div className="form-grid">
+                {[
+                  ["principal", bn ? "মূলধন (৳)" : "Principal (৳)"],
+                  ["interest", bn ? "সুদ (৳)" : "Interest (৳)"],
+                  ["fees", bn ? "ফি (৳)" : "Fees (৳)"],
+                ].map(([name, label]) => (
+                  <label key={name}>
+                    {label}
+                    <input
+                      name={name}
+                      required
+                      inputMode="decimal"
+                      pattern="[0-9]+(\.[0-9]{1,2})?"
+                      defaultValue="0"
+                    />
+                  </label>
+                ))}
+                <label>
+                  {bn ? "পরিশোধের তারিখ" : "Payment date"}
+                  <input
+                    name="paidOn"
+                    type="date"
+                    required
+                    min={r.valuationDate ?? undefined}
+                    max={new Intl.DateTimeFormat("en-CA", {
+                      timeZone: "Asia/Dhaka",
+                    }).format(new Date())}
+                    defaultValue={new Intl.DateTimeFormat("en-CA", {
+                      timeZone: "Asia/Dhaka",
+                    }).format(new Date())}
+                  />
+                </label>
+              </div>
+              <label>
+                {bn ? "নোট" : "Note"}
+                <textarea name="note" maxLength={1000} />
+              </label>
+              <Button disabled={busy}>
+                {bn ? "পরিশোধ সংরক্ষণ" : "Save repayment"}
+              </Button>
+            </form>
+          )}
           <div className="section-form">
             <h3>
               {r.archived
@@ -232,6 +301,12 @@ export function RecordDetail({
               : "You have read-only access to this record.")}
         </p>
       )}
+      <RecordHistory
+        familyId={familyId}
+        recordId={r.id}
+        version={r.version}
+        locale={locale}
+      />
       {role === "owner" && (
         <form
           className="section-form"

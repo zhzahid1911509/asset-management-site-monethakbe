@@ -327,3 +327,44 @@ export const emailJobs = pgTable(
   },
   (t) => [index("email_due_idx").on(t.status, t.availableAt)],
 );
+
+export const liabilityPayments = pgTable(
+  "liability_payments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    recordId: uuid("record_id").notNull(),
+    principal: numeric("principal", { precision: 24, scale: 2 }).notNull(),
+    interest: numeric("interest", { precision: 24, scale: 2 }).notNull(),
+    fees: numeric("fees", { precision: 24, scale: 2 }).notNull(),
+    balanceBefore: numeric("balance_before", {
+      precision: 24,
+      scale: 2,
+    }).notNull(),
+    balanceAfter: numeric("balance_after", {
+      precision: 24,
+      scale: 2,
+    }).notNull(),
+    paidOn: date("paid_on").notNull(),
+    note: text("note").default("").notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: time("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.familyId, t.recordId],
+      foreignColumns: [records.familyId, records.id],
+    }),
+    index("payment_history_idx").on(t.familyId, t.recordId, t.paidOn),
+    check(
+      "payment_amounts_ck",
+      sql`${t.principal} >= 0 and ${t.interest} >= 0 and ${t.fees} >= 0 and ${t.principal} < 'Infinity'::numeric and ${t.interest} < 'Infinity'::numeric and ${t.fees} < 'Infinity'::numeric and ${t.principal} + ${t.interest} + ${t.fees} > 0`,
+    ),
+    check(
+      "payment_balance_ck",
+      sql`${t.balanceAfter} >= 0 and ${t.balanceBefore} < 'Infinity'::numeric and ${t.balanceAfter} = ${t.balanceBefore} - ${t.principal}`,
+    ),
+  ],
+);

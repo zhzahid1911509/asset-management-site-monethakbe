@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.1.2 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.2.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -13,11 +13,11 @@ A runnable **Next.js 16 / React / strict TypeScript** application for the first 
 - Per-record view/edit/export grants and denies, family isolation and immediate membership revocation checks.
 - All 131 catalog types, with English and Bengali names; no user/demo assets seeded.
 - Asset creation, name/notes editing, append-only valuations, archive/restore, ownership-adjusted totals.
-- Separate basic liability records with the family's included outstanding balance and its as-of date.
+- Liability repayments with separate principal, interest and fees, exact outstanding balances, append-only application payment entries and record-level financial history.
 - BDT exact-decimal calculations, missing-value states, permission-filtered dashboard and category counts.
 - Search/filtering, family switching, responsive layout, English/Bengali primary UI, Simple/Advanced preferences.
 - Authorized JSON current-record export and audit entries for mutations/exports.
-- Transactional idempotency for record creation, edits, valuation and archive/restore; optimistic record versions.
+- Transactional idempotency for record creation, edits, valuation, repayments and archive/restore; optimistic record versions.
 - Durable encrypted email queue and a Resend worker with bounded retries, job leases, fencing and idempotency keys.
 - Drizzle schema, generated SQL migration, versioned catalog seed, meaningful PostgreSQL-engine integration tests and authentication tests.
 
@@ -53,7 +53,7 @@ To share a record, invite a member and wait for acceptance. Open the record as o
 
 | Command                          | Purpose                                                     |
 | -------------------------------- | ----------------------------------------------------------- |
-| `npm run dev`                    | Local web app + email worker                                    |
+| `npm run dev`                    | Local web app + email worker                                |
 | `npm run typecheck`              | Strict TypeScript validation                                |
 | `npm test`                       | Unit/integration/authentication checks using synthetic data |
 | `npm run build`                  | Production build                                            |
@@ -107,3 +107,7 @@ Implementation consulted official [Next.js authentication](https://nextjs.org/do
 See `docs/EMAIL-FIX.md` for upgrade instructions, queue diagnostics and delivery-error explanations. `npm run dev:web` runs only Next.js; `npm run email:status` inspects safe queue status. Production still uses a separately supervised worker.
 
 Version 0.1.2 classifies Resend 403 errors using allowlisted diagnostic codes and shows the effective sender domain in worker startup/status output. Raw provider messages, API keys and verification links are not logged.
+
+## Upgrade from 0.1.2
+
+See [docs/UPGRADE-0.2.md](docs/UPGRADE-0.2.md). This release requires the new tracked database migration before starting the app. Keep your existing environment files and secrets.

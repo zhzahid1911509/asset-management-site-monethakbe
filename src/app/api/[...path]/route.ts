@@ -56,6 +56,8 @@ async function handler(
             await body(request),
             key,
           );
+        if (path.length === 5 && action === "history" && method === "GET")
+          return service.recordHistory(db, familyId, actor, id);
         if (path.length === 4 && method === "PATCH")
           return service.editRecord(
             db,
@@ -66,6 +68,15 @@ async function handler(
             key,
           );
         if (path.length === 5 && method === "POST") {
+          if (action === "payments")
+            return service.addPayment(
+              db,
+              familyId,
+              actor,
+              id,
+              await body(request),
+              key,
+            );
           if (action === "archive")
             return service.archiveRecord(
               db,
