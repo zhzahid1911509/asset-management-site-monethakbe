@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ArrowRight, ShieldCheck, Leaf } from "lucide-react";
+import { ArrowRight, ShieldCheck, Leaf, Eye, EyeOff } from "lucide-react";
 import { Button } from "./button";
 import { createAuthClient } from "better-auth/react";
 const auth = createAuthClient();
@@ -11,12 +11,18 @@ export function AuthForm() {
     [name, setName] = useState(""),
     [email, setEmail] = useState(""),
     [password, setPassword] = useState(""),
+    [showPassword, setShowPassword] = useState(false),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [error, setError] = useState("");
   useEffect(() => {
-    if (new URLSearchParams(location.search).get("token")) setMode("reset");
+    const params = new URLSearchParams(location.search);
+    if (params.get("token")) setMode("reset");
+    else if (params.get("mode") === "signup") setMode("signup");
   }, []);
+  useEffect(() => {
+    setShowPassword(false);
+  }, [mode]);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -153,23 +159,42 @@ export function AuthForm() {
               </label>
             )}
             {mode !== "forgot" && (
-              <label>
-                Password
-                <input
-                  type="password"
-                  required
-                  minLength={mode === "signin" ? 1 : 12}
-                  maxLength={128}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete={
-                    mode === "signin" ? "current-password" : "new-password"
-                  }
-                />
+              <div className="password-field">
+                <label htmlFor="auth-password">Password</label>
+                <div className="password-control">
+                  <input
+                    id="auth-password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    minLength={mode === "signin" ? 1 : 12}
+                    maxLength={128}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete={
+                      mode === "signin" ? "current-password" : "new-password"
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                    aria-controls="auth-password"
+                    onClick={() => setShowPassword((v) => !v)}
+                  >
+                    {showPassword ? (
+                      <EyeOff size={18} aria-hidden="true" />
+                    ) : (
+                      <Eye size={18} aria-hidden="true" />
+                    )}
+                    <span>{showPassword ? "Hide" : "Show"}</span>
+                  </button>
+                </div>
                 {mode !== "signin" && (
                   <small>Use at least 12 characters.</small>
                 )}
-              </label>
+              </div>
             )}
             {error && (
               <p role="alert" className="notice error">

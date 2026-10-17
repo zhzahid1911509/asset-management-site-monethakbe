@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.2.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.2.1 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -111,3 +111,7 @@ Version 0.1.2 classifies Resend 403 errors using allowlisted diagnostic codes an
 ## Upgrade from 0.1.2
 
 See [docs/UPGRADE-0.2.md](docs/UPGRADE-0.2.md). This release requires the new tracked database migration before starting the app. Keep your existing environment files and secrets.
+
+## Version 0.2.1 — home and authentication UI
+
+The public `/` route now shows the Bengali family-first home page. `/app` remains the workspace and `/auth` retains the configuration checks. Sign-in, sign-up and reset-password forms have keyboard-accessible Show/Hide controls. Home-page registration links open `/auth?mode=signup`. No database migration is added in 0.2.1; upgrading from 0.1.x still requires the 0.2.0 migration.

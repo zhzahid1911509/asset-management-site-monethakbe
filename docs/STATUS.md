@@ -53,3 +53,7 @@ Version 0.1.1 starts the mail worker alongside Next.js with `npm run dev`. Produ
 ## Version 0.2.0 finance increment
 
 Repayments and on-screen valuation/payment history are implemented end to end. Payment principal alone reduces the outstanding liability; interest and fees do not. Dates are chronological from the last recorded balance and cannot be in the future. Archived liabilities reject new payments. History is view-authorized and displays the latest 100 entries with an explicit limit notice. Payments cannot currently be edited/reversed; reconciliation and correction workflows remain pending. Current-record JSON exports include updated balances, but do not yet contain the payment ledger. No automatic bank transfers, amortization, bank reconciliation or interest accrual are implied.
+
+## Version 0.2.1 presentation update
+
+A responsive Bengali home page groups the supplied family, trust and technology taglines, with English supporting copy. It links to working authentication routes and labels document uploads, reminders and AI as upcoming. Password visibility toggles are available for sign-in, sign-up and reset, hidden initially and reset to hidden when changing modes.

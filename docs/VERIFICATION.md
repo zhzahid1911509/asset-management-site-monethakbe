@@ -27,3 +27,9 @@ Version 0.1.2 adds tests for documented Resend 403 subtypes and a non-JSON error
 Version 0.2.0 adds ten repayment integration tests: principal-only balance reduction, idempotent replay/payload conflicts, overpayment rollback, invalid dates/zero amounts, interest-only/final repayment, competing versions, cross-family denial, view-only history, archived-record rejection, and audit-failure rollback. The suite applies both tracked migrations to a clean embedded PostgreSQL database. Existing deployment upgrades have not been executed against a live Neon branch.
 
 Implementation references consulted: https://orm.drizzle.team/docs/transactions and https://www.postgresql.org/docs/18/explicit-locking.html .
+
+## Version 0.2.1 UI verification
+
+Production build and its strict TypeScript step passed after the home-page and password-control changes. HTTP smoke checks returned 200 for `/`, `/auth` and `/auth?mode=signup`, with the expected headline and initially masked password control in server-rendered HTML. The local smoke server used synthetic configuration and performed no login, database mutation or email send.
+
+Browser interaction and screenshot checks were attempted but could not run: no browser binary was installed and the Chromium download failed. Responsive breakpoints, focus styles and button semantics were reviewed in source; visual layout and Show/Hide interaction still need a browser acceptance check. The previous 49-test finance/backend suite was not rerun for this UI-only release.
