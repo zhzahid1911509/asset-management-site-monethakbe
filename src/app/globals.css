@@ -2051,3 +2051,24 @@ thead {
 .document-preview { max-width: 100%; max-height: 420px; object-fit: contain; margin-top: 1rem; }
 .record-documents fieldset { border: 0; padding: 0; margin-top: 1.5rem; min-width: 0; }
 .record-documents legend { font-weight: 700; margin-bottom: 1rem; }
+
+/* Supplied brand artwork retains its original aspect ratio and content. */
+.brand-image { display: inline-flex; width: 220px; max-width: 100%; flex-shrink: 0; }
+.brand-image img { display: block; width: 100%; height: auto; border-radius: 8px; }
+.sidebar .brand-image { width: 200px; padding: 0; margin-bottom: 20px; }
+.auth-story > .brand-image { width: 250px; }
+.home-footer .brand-image { width: 160px; }
+.install-panel { position: relative; background: #f1f5f7; color: #17324e; padding: 16px 24px; border-top: 1px solid #dce4eb; }
+.install-panel > details { max-width: 1000px; margin: auto; }
+.install-panel summary { cursor: pointer; font-weight: 600; padding: 8px 0; }
+.install-content { padding: 20px 0; line-height: 1.7; }
+.install-content h2 { font-size: 24px; }
+.install-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin: 20px 0; }
+.install-grid ol { padding-left: 22px; }
+@media(max-width:700px) { .home-header .brand-image { width: 170px; } .install-grid { grid-template-columns: 1fr; gap: 12px; } }
+
+.app-footer .brand-image { width: 130px; vertical-align: middle; margin-right: 12px; }
+.sidebar { overflow-y: auto; }
+body:has(.app-layout) > .install-panel { margin-left: 244px; }
+@media (max-width:1150px) { body:has(.app-layout) > .install-panel { margin-left: 220px; } }
+@media (max-width:850px) { body:has(.app-layout) > .install-panel { margin-left: 0; } }

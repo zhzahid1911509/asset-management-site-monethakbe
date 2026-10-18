@@ -1,4 +1,6 @@
 "use client";
+import { Brand } from "@/components/brand";
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   LayoutDashboard,
@@ -285,14 +287,7 @@ export function Application({
         />
       )}
       <aside className={"sidebar " + (mobile ? "open" : "")}>
-        <a href="/app" className="brand">
-          <span className="brand-mark">
-            <Leaf size={24} />
-          </span>
-          <span>
-            মনে থাকবে<small>FAMILY ASSET & RECORDS</small>
-          </span>
-        </a>
+        <Brand href="/app" />
         <div className="workspace-picker">
           <span className="mini-label">{t.workspace}</span>
           <select
@@ -930,12 +925,12 @@ export function Application({
           )}
           <footer className="app-footer">
             <span>
-              মনে থাকবে <span className="footer-dot">·</span>{" "}
+              <Brand href="/app" />
               {bn
                 ? "যত্নে রাখুন, মনে রাখুন।"
                 : "A little care for everything that matters."}
             </span>
-            <span>Foundation 0.1</span>
+            <span>Version 0.5.1</span>
           </footer>
         </main>
       </div>

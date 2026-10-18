@@ -1,4 +1,6 @@
 "use client";
+import { Brand } from "@/components/brand";
+
 import { useState } from "react";
 import { api, errorText } from "@/lib/client";
 import { Button } from "@/components/button";
@@ -8,7 +10,8 @@ export default function Page() {
   return (
     <main className="setup">
       <section className="setup-card">
-        <span className="eyebrow">মনে থাকবে</span>
+        <Brand />
+
         <h1>A place in the family.</h1>
         <p>
           Sign in using the email address that received this invitation, then

@@ -88,3 +88,10 @@ A responsive Bengali home page groups the supplied family, trust and technology 
 - Idempotent completed uploads, optimistic publication, logical family quota, explicit upload states, storage-content integrity check and operator dry-run/apply cleanup of stale failed objects. See DOCUMENTS.md for the cross-system failure model and versioned-bucket retention limitation.
 - Limits: 100 documents per record, latest 100 versions/events displayed, 1 GiB logical family allowance. No permanent-delete UI, OCR, Drive OAuth, Office files, resumable uploads or full document export/backup.
 - Live storage/scanner configuration, malware signatures, deployment concurrency and browser interaction remain deployment verification requirements.
+
+## Version 0.5.1 branding, service email and installation
+
+- Supplied logo integrated across public/authentication/workspace/setup/error surfaces, with browser and home-screen icons.
+- Shared professional HTML/plain-text templates for all implemented service email: verification/resend, password reset and invitations. Existing encrypted text-only queued jobs remain supported. No reminder delivery added.
+- Web-app manifest, Android install-prompt handling, iOS/iPadOS Safari instructions and a network-only service worker with generic offline fallback. No private offline cache, native store binaries, push notifications or background sync.
+- Real-device installation and email-client rendering still require deployment verification; see INSTALLATION.md.

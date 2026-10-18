@@ -436,7 +436,7 @@ describe("real PostgreSQL schema and authorized operations", () => {
     const jobs = await fixture.db.select().from(s.emailJobs);
     const message = JSON.parse(unseal(jobs.at(-1)!.payload, "email"));
     expect(jobs.at(-1)!.payload).not.toContain(invited.email);
-    const match = message.text.match(/http:\/\/[^ ]+/);
+    const match = message.text.match(/https?:\/\/\S+/);
     const token = new URL(match[0]).searchParams.get("token")!;
     await expect(
       service.acceptInvitation(fixture.db, other, { token }),

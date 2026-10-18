@@ -4,6 +4,7 @@ const payload = z.object({
   to: z.string().email(),
   subject: z.string().min(1),
   text: z.string().min(1),
+  html: z.string().min(1).optional(),
 });
 export class DeliveryError extends Error {
   constructor(

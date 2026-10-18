@@ -1,3 +1,4 @@
+import { emailTemplate } from "./email-templates";
 import { and, eq, desc, asc, sql } from "drizzle-orm";
 import { createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
@@ -589,11 +590,7 @@ export async function inviteMember(
     url.searchParams.set("token", token);
     await q.insert(s.emailJobs).values({
       payload: seal(
-        JSON.stringify({
-          to: data.email,
-          subject: "Invitation to মনে থাকবে",
-          text: `You have been invited to a family workspace. Sign in with ${data.email}, then open this link within 48 hours: ${url.toString()}`,
-        }),
+        JSON.stringify(emailTemplate("invitation", url.toString(), data.email)),
         "email",
       ),
     });
@@ -1061,19 +1058,17 @@ export async function reversePayment(
       const after = new Decimal(balance.outstanding)
         .plus(payment.principal)
         .toFixed(2);
-      await q
-        .insert(s.paymentReversals)
-        .values({
-          familyId,
-          recordId: id,
-          paymentId: payment.id,
-          principal: payment.principal,
-          balanceBefore: balance.outstanding,
-          balanceAfter: after,
-          reversedOn: data.reversedOn,
-          reason: data.reason,
-          createdBy: a.id,
-        });
+      await q.insert(s.paymentReversals).values({
+        familyId,
+        recordId: id,
+        paymentId: payment.id,
+        principal: payment.principal,
+        balanceBefore: balance.outstanding,
+        balanceAfter: after,
+        reversedOn: data.reversedOn,
+        reason: data.reason,
+        createdBy: a.id,
+      });
       await q
         .update(s.liabilities)
         .set({ outstanding: after, balanceAsOf: data.reversedOn })
@@ -1190,17 +1185,15 @@ export async function saveReminder(
           .values({ familyId, recordId: id, ...fields, createdBy: a.id })
           .returning();
       }
-      await q
-        .insert(s.reminderEvents)
-        .values({
-          familyId,
-          recordId: id,
-          reminderId: reminder.id,
-          recordVersion: record.version,
-          action: data.reminderId ? "updated" : "created",
-          snapshot: reminderState(reminder),
-          createdBy: a.id,
-        });
+      await q.insert(s.reminderEvents).values({
+        familyId,
+        recordId: id,
+        reminderId: reminder.id,
+        recordVersion: record.version,
+        action: data.reminderId ? "updated" : "created",
+        snapshot: reminderState(reminder),
+        createdBy: a.id,
+      });
       await audit(
         q,
         familyId,
@@ -1262,17 +1255,15 @@ export async function changeReminder(
         .set({ status, dueOn, updatedAt: new Date() })
         .where(eq(s.reminders.id, reminder.id));
       // For actions, snapshot the occurrence being acted on (before advancing recurrence).
-      await q
-        .insert(s.reminderEvents)
-        .values({
-          familyId,
-          recordId: id,
-          reminderId: reminder.id,
-          recordVersion: record.version,
-          action: data.action,
-          snapshot: reminderState(reminder),
-          createdBy: a.id,
-        });
+      await q.insert(s.reminderEvents).values({
+        familyId,
+        recordId: id,
+        reminderId: reminder.id,
+        recordVersion: record.version,
+        action: data.action,
+        snapshot: reminderState(reminder),
+        createdBy: a.id,
+      });
       await audit(q, familyId, a, `reminder.${data.action}`, id);
       return { id };
     },

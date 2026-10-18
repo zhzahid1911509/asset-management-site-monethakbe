@@ -64,3 +64,12 @@ Executed in the implementation workspace using synthetic data:
 - Source ZIP validation: performed during packaging; generated output, dependencies and populated environment files excluded.
 
 Not executed: live Neon migration/pooling/concurrency, live S3 requests/IAM/encryption, actual ClamAV signatures/detection, browser upload/preview interactions, deployment load/edge limits or a backup restoration drill. These remain explicit deployment checks in DOCUMENTS.md. No real email was sent.
+
+## Version 0.5.1 — logo, email and web-app installation
+
+- Strict TypeScript check passed.
+- **110 tests passed across 10 files**, including existing auth/invitation workflows and five new tests covering HTML/plain-text templates, escaping and URL restrictions, backward-compatible email transport, manifest/icon assets, and offline service-worker/API boundaries.
+- Production Next.js build passed, including the new manifest route.
+- The invitation integration test's URL extraction was updated to stop at any whitespace, so it correctly parses the multiline professional email body. Invitation acceptance, recipient binding and one-time use still pass.
+- The supplied logo was inspected and copied unchanged; PNG installation icons were mechanically resized/padded from it.
+- A local HTTP smoke test could not run because Next's server startup encountered the environment's `uv_interface_addresses` system error. No successful browser/device interaction, actual installation, live delivery or inbox rendering is claimed. No real email was sent.

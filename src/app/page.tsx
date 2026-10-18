@@ -1,3 +1,4 @@
+import { Brand } from "@/components/brand";
 import {
   ArrowRight,
   Leaf,
@@ -17,14 +18,7 @@ export default function Page() {
         মূল বিষয়বস্তুতে যান
       </a>
       <header className="home-header home-container">
-        <a href="/" className="brand" aria-label="মনে থাকবে — হোম">
-          <span className="brand-mark">
-            <Leaf aria-hidden="true" />
-          </span>
-          <span>
-            মনে থাকবে<small lang="en">REMEMBER WHAT MATTERS</small>
-          </span>
-        </a>
+        <Brand />
         <nav aria-label="প্রধান নেভিগেশন">
           <a className="home-nav-about" href="#why">
             কেন মনে থাকবে
@@ -203,9 +197,7 @@ export default function Page() {
         </section>
       </main>
       <footer className="home-footer home-container">
-        <a className="brand" href="/">
-          মনে থাকবে<span className="home-footer-dot">·</span>
-        </a>
+        <Brand />
         <p>পরিবারের জন্য, প্রজন্মের পর প্রজন্ম।</p>
         <a href="/auth">
           আপনার ওয়ার্কস্পেস <ArrowRight size={14} aria-hidden="true" />

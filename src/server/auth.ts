@@ -1,3 +1,4 @@
+import { emailTemplate, AUTH_LINK_SECONDS } from "./email-templates";
 import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
@@ -38,6 +39,7 @@ export function buildAuth(
     },
     emailAndPassword: {
       enabled: true,
+      resetPasswordTokenExpiresIn: AUTH_LINK_SECONDS,
       requireEmailVerification: true,
       minPasswordLength: 12,
       maxPasswordLength: 128,
@@ -46,6 +48,7 @@ export function buildAuth(
         enqueue(user.email, url, "Reset your password"),
     },
     emailVerification: {
+      expiresIn: AUTH_LINK_SECONDS,
       sendOnSignUp: true,
       sendOnSignIn: true,
       autoSignInAfterVerification: false,
@@ -70,11 +73,15 @@ export function getAuth() {
       .insert(schema.emailJobs)
       .values({
         payload: seal(
-          JSON.stringify({
-            to,
-            subject: `${purpose} — মনে থাকবে`,
-            text: `${purpose}: ${url}\nIf you did not request this, ignore this email.`,
-          }),
+          JSON.stringify(
+            emailTemplate(
+              purpose === "Reset your password"
+                ? "password-reset"
+                : "verification",
+              url,
+              to,
+            ),
+          ),
           "email",
         ),
       });

@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.5.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.5.1 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -131,3 +131,11 @@ See [docs/UPGRADE-0.4.md](docs/UPGRADE-0.4.md). Apply migration 0003 before star
 ## Upgrade to 0.5.0
 
 See [docs/UPGRADE-0.5.md](docs/UPGRADE-0.5.md). Migration 0004 adds private document metadata, file versions and event history. Record forms support upload, replacement, metadata search/edit, archive/restore, image preview and authenticated download. A private S3-compatible bucket and ClamAV are required to enable uploads; existing features work without them. Setup, permissions, limits and cleanup are documented in [docs/DOCUMENTS.md](docs/DOCUMENTS.md).
+
+## Upgrade to 0.5.1 — branding, email and installation
+
+The supplied logo appears across public/auth/workspace/setup pages and browser/home-screen icons. Verification, password-reset and invitation emails now include branded HTML plus plain text, action-specific guidance and expiry information. Existing queued plain-text jobs remain compatible.
+
+Android and iPhone/iPad installation help is available at the bottom of every page. Supported browsers can show the native install prompt; Safari users can add the app through Share → Add to Home Screen. This is an installable web app, with online access required for records; it does not include native store packages or push notifications. See [docs/INSTALLATION.md](docs/INSTALLATION.md).
+
+Keep your environment files and secrets, run `npm ci`, then restart both web and email-worker processes. For production, run `npm run build` before restarting. No new database migration is added in 0.5.1; users upgrading from older releases must still apply existing migrations. Old queued emails keep their original content.

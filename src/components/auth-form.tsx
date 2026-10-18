@@ -1,4 +1,6 @@
 "use client";
+import { Brand } from "@/components/brand";
+
 import { useState, useEffect } from "react";
 import { ArrowRight, ShieldCheck, Leaf, Eye, EyeOff } from "lucide-react";
 import { Button } from "./button";
@@ -79,14 +81,7 @@ export function AuthForm() {
   return (
     <main className="auth-layout">
       <section className="auth-story">
-        <a href="/" className="brand">
-          <span className="brand-mark">
-            <Leaf />
-          </span>
-          <span>
-            মনে থাকবে<small>FAMILY ASSET & RECORDS</small>
-          </span>
-        </a>
+        <Brand />
         <div>
           <span className="eyebrow">
             A LITTLE ORDER. A LOT OF PEACE OF MIND.

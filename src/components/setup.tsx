@@ -1,17 +1,11 @@
+import { Brand } from "@/components/brand";
 import { Leaf, ArrowUpRight, CheckCircle2, Circle } from "lucide-react";
 export function Setup({ checks }: { checks: Record<string, boolean> }) {
   return (
     <main className="setup">
-      <a className="brand" href="/">
-        <span className="brand-mark">
-          <Leaf />
-        </span>
-        <span>
-          মনে থাকবে<small>FAMILY ASSET & RECORDS</small>
-        </span>
-      </a>
+      <Brand />
       <section className="setup-card">
-        <span className="eyebrow">FOUNDATION RELEASE · 0.1</span>
+        <span className="eyebrow">FAMILY ASSET MANAGEMENT</span>
         <h1>
           Your family’s records.
           <br />
