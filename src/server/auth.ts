@@ -4,13 +4,6 @@ import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { getDb } from "../db";
 import * as schema from "../db/schema";
 import { seal } from "./secrets";
-
-const appOrigin = process.env.APP_ORIGIN;
-const altAppOrigin = process.env.ALTERNATIVE_APP_ORIGIN;
-if (!appOrigin && !altAppOrigin) {
-  throw new Error("APP_ORIGIN environment variable is missing");
-}
-
 export function configuration() {
   return {
     database: !!process.env.DATABASE_URL,
@@ -33,7 +26,7 @@ export function buildAuth(
     baseURL: process.env.APP_ORIGIN,
     secret: process.env.BETTER_AUTH_SECRET,
     database: drizzleAdapter(db, { provider: "pg", schema, transaction: true }),
-    trustedOrigins: [appOrigin!, altAppOrigin!],
+    trustedOrigins: [process.env.APP_ORIGIN!],
     hooks: {
       before: createAuthMiddleware(async (ctx) => {
         if (
