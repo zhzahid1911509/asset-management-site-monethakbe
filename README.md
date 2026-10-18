@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.7.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.7.1 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -153,3 +153,7 @@ Use the persistent **Theme** selector to choose Light, Dark or System on any pag
 Open **Settings → Reports and CSV** to generate an export-authorized current summary, filter by kind/category, optionally include archived rows, download CSV, or print/save PDF through the browser. Reports recompute exact totals from eligible filtered rows; they do not expose view-only records. Unknown values remain unknown and archived records stay out of totals.
 
 Run `npm ci` and restart the app. For production, rebuild before restarting. No new database migration is required from 0.6.0; older releases still need their tracked migrations. Keep environment files and secrets. See [docs/THEMES-AND-REPORTS.md](docs/THEMES-AND-REPORTS.md).
+
+## Upgrade to 0.7.1 — mobile layouts
+
+Responsive Android/iOS browser and installed PWA layouts, safe-area spacing, mobile drawer focus management, readable controls, adaptive dialogs and keyboard-accessible scrolling tables. Includes the recent theme logos and document fixes. Preserve your .env, run npm ci, then build and restart. No new database migration from 0.7.0. See docs/MOBILE.md for device checks and limitations.

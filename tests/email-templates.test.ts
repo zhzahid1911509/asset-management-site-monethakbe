@@ -19,7 +19,7 @@ it("provides action-specific HTML and plain text with matching expiry and brand"
       "https://example.test/action?token=synthetic&next=app",
       "reader@example.test",
     );
-    expect(mail.html).toContain("/brand/logo.jpg");
+    expect(mail.html).toContain("/brand/logo-light.png");
     expect(mail.html).toContain("token=synthetic&amp;next=app");
     expect(mail.text).toContain("token=synthetic&next=app");
     expect(mail.text).toContain(kind === "invitation" ? "48 hours" : "1 hour");

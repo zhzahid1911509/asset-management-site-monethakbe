@@ -108,3 +108,7 @@ This supersedes the earlier release notes that described email reminders as unav
 - Current filtered reports with export-authorized category/record totals, unknown-value counts, archive handling, CSV download and browser print/save-PDF. Each action requests fresh data. Current exports now use repeatable-read snapshots.
 - CSV uses UTF-8 BOM, correct quoting and spreadsheet-formula neutralization. Preview is limited to 100 rows; CSV/print include all selected rows, with a 5,000-exportable-record server cap and explicit error rather than truncation.
 - This supersedes prior notes describing all CSV/PDF presentation and themes as absent. Historical reporting, full history exports, server-generated PDF and backup restoration remain unimplemented. Real-browser visual/accessibility/printing checks remain deployment tasks.
+
+## Version 0.7.1
+
+Responsive mobile layout refinements, safe areas, drawer keyboard/focus handling, larger controls, dynamic-height dialogs and scrollable tables. Includes theme-specific supplied logos and document fixes. This remains an installable web app, not a native store binary. Real-device visual checks remain outstanding.

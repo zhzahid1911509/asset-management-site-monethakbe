@@ -157,6 +157,43 @@ export function Application({
     const params = new URLSearchParams(location.search);
     if (params.get("view") === "reminders") setSection("reminders");
   }, []);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 850px)");
+    const sidebar = sidebarRef.current;
+    const sync = () => {
+      if (sidebar) sidebar.inert = media.matches && !mobile;
+      if (!media.matches && mobile) setMobile(false);
+    };
+    sync();
+    media.addEventListener("change", sync);
+    if (!mobile) return () => media.removeEventListener("change", sync);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    sidebar?.querySelector<HTMLButtonElement>(".mobile-nav-close")?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); setMobile(false); }
+      if (event.key !== "Tab" || !sidebar) return;
+      const items = Array.from(sidebar.querySelectorAll<HTMLElement>(
+        'a[href], button:not(:disabled), select:not(:disabled), [tabindex="0"]'
+      )).filter(item => item.getClientRects().length > 0);
+      const first = items[0], last = items[items.length - 1];
+      if (!first) return;
+      if (event.shiftKey && (document.activeElement === first || !sidebar.contains(document.activeElement))) {
+        event.preventDefault(); last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !sidebar.contains(document.activeElement))) {
+        event.preventDefault(); first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKey);
+      media.removeEventListener("change", sync);
+      if (media.matches) menuRef.current?.focus();
+    };
+  }, [mobile]);
   const sequence = useRef(0);
   const t = language[locale],
     bn = locale === "bn";
@@ -299,7 +336,8 @@ export function Application({
           onClick={() => setMobile(false)}
         />
       )}
-      <aside className={"sidebar " + (mobile ? "open" : "")}>
+      <aside ref={sidebarRef} id="workspace-navigation" aria-label="Workspace navigation" className={"sidebar " + (mobile ? "open" : "")}>
+        <button type="button" className="icon-button mobile-nav-close" aria-label="Close navigation" onClick={() => setMobile(false)}><X /></button>
         <Brand href="/app" />
         <div className="workspace-picker">
           <span className="mini-label">{t.workspace}</span>
@@ -386,12 +424,15 @@ export function Application({
           </div>
         </div>
       </aside>
-      <div className="app-main">
+      <div className="app-main" inert={mobile}>
         <header className="topbar">
           <div className="breadcrumb">
             <button
               className="icon-button mobile-toggle"
               aria-label="Open navigation"
+              ref={menuRef}
+              aria-controls="workspace-navigation"
+              aria-expanded={mobile}
               onClick={() => setMobile(true)}
             >
               <Menu />
@@ -688,7 +729,7 @@ export function Application({
                       </span>
                     </div>
                     {rows.length ? (
-                      <div className="table-scroll">
+                      <div className="table-scroll" tabIndex={0} role="region" aria-label="Scrollable records table">
                         <table>
                           <thead>
                             <tr>
@@ -964,7 +1005,7 @@ export function Application({
                 ? "যত্নে রাখুন, মনে রাখুন।"
                 : "A little care for everything that matters."}
             </span>
-            <span>Version 0.7.0</span>
+            <span>Version 0.7.1</span>
           </footer>
         </main>
       </div>

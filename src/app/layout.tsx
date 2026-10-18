@@ -3,7 +3,7 @@ import { THEME_BOOTSTRAP } from "@/lib/theme";
 import { InstallApp } from "@/components/install-app";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-export const viewport: Viewport = { themeColor: "#12345a" };
+export const viewport: Viewport = { themeColor: "#12345a", width: "device-width", initialScale: 1, viewportFit: "cover" };
 export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   applicationName: "মনে থাকবে",
@@ -38,3 +38,5 @@ export default function RootLayout({
 }
 
 import "./themes.css";
+
+import "./responsive.css";

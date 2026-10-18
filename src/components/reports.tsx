@@ -62,7 +62,7 @@ function ReportView({
         {bn ? "রেকর্ডের মূল্য অজানা" : "records without a value"}
       </p>
       <h3>{bn ? "বিভাগ অনুযায়ী" : "By category"}</h3>
-      <div className="table-scroll">
+      <div className="table-scroll" tabIndex={0} role="region" aria-label="Scrollable records table">
         <table>
           <thead>
             <tr>
@@ -85,7 +85,7 @@ function ReportView({
         </table>
       </div>
       <h3>{bn ? "রেকর্ডসমূহ" : "Records"}</h3>
-      <div className="table-scroll">
+      <div className="table-scroll" tabIndex={0} role="region" aria-label="Scrollable records table">
         <table>
           <thead>
             <tr>

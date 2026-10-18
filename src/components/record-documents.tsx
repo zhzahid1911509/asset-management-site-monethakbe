@@ -308,10 +308,7 @@ export function RecordDocuments({
             </p>
           )}
           {selected && (
-            <div
-              className="document-panel"
-              key={`document-panel:${selected.id}`}
-            >
+            <div className="document-panel" key={selected.id}>
               <h4>{selected.title}</h4>
               <p>{selected.description}</p>
               <p className="muted">{selected.tags.join(" · ")}</p>
@@ -427,7 +424,7 @@ export function RecordDocuments({
           )}
           {editable && data.configured && !selected?.archived && (
             <form
-              key={`document-upload:${selected?.id ?? "new"}`}
+              key={selected?.id ?? "new"}
               onSubmit={(e) => {
                 e.preventDefault();
                 void upload(e.currentTarget);

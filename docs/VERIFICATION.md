@@ -91,3 +91,7 @@ Executed with synthetic data and mocked mail transport only:
 - Clean production build passed after removing a corrupt generated `.next` cache; the source and database migrations were not reset.
 - Static contrast calculations for the new principal dark-mode pairs: body 14.98:1, muted card text 8.36:1 and primary button text 9.06:1. These three calculations are not a full page-level WCAG audit.
 - Browser rendering, first-paint behavior, native theme inputs, report print pagination, Bengali font rendering and actual PDF output remain unverified in a real browser/device. No live customer data or email service was used.
+
+## Version 0.7.1 — mobile interface
+
+Strict TypeScript passed. Full suite: 145 passed, one stale email-logo expectation failed; after updating that expectation, all three email-template tests passed on a targeted rerun. The 146 existing tests are therefore passing across those runs. Production webpack build passed. Browser download failed, so real Android/iOS, viewport, keyboard and visual checks remain unverified; use docs/MOBILE.md. No live storage or email operation was performed.

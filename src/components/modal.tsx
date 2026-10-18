@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useId } from "react";
 import { X } from "lucide-react";
 export function Modal({
   title,
@@ -10,6 +10,7 @@ export function Modal({
   children: React.ReactNode;
   onClose: () => void;
 }) {
+  const titleId = useId();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const d = ref.current;
@@ -20,11 +21,11 @@ export function Modal({
     <dialog
       ref={ref}
       className="modal"
-      aria-labelledby="dialog-title"
+      aria-labelledby={titleId}
       onCancel={onClose}
     >
       <header>
-        <h2 id="dialog-title">{title}</h2>
+        <h2 id={titleId}>{title}</h2>
         <button
           aria-label="Close dialog"
           className="icon-button"
