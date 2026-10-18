@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.6.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.7.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -98,7 +98,7 @@ The test database is PGlite, running the tracked PostgreSQL schema against synth
 
 ## Known boundaries
 
-Read `docs/STATUS.md` before deployment. AI, Drive, push reminder delivery, custom roles/categories/fields, historical net-worth reports, multi-currency, PDF/CSV reports, full backup/restore and production observability are not implemented yet. No controls pretend to provide these capabilities.
+Read `docs/STATUS.md` before deployment. AI, Drive, push reminder delivery, custom roles/categories/fields, historical net-worth reports, multi-currency, server-generated PDF reports, full backup/restore and production observability are not implemented yet. No controls pretend to provide these capabilities.
 
 The UI translates the main workflows and catalog; auth-provider messages, role names and some validation/detail labels remain English. Full WCAG conformance and browser interaction testing remain outstanding. Simple/Advanced currently controls extra identifiers/version details; it is not yet the full advanced-workflow suite.
 
@@ -145,3 +145,11 @@ Keep your environment files and secrets, run `npm ci`, then restart both web and
 Apply migration 0005, then restart the web app and email worker. Open Settings → Email reminders to opt in separately for each family. Choose reminder categories, advance notice, preferred time, time zone and quiet hours. Personal delivery history shows queue/provider status. The same worker now schedules and delivers reminders; no additional daemon is required.
 
 See [docs/UPGRADE-0.6.md](docs/UPGRADE-0.6.md) and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md). The worker requires APP_ORIGIN as well as its existing settings. Reminder emails contain generic sign-in links rather than private record details. No member is subscribed by the migration.
+
+## Upgrade to 0.7.0 — themes and current-record reports
+
+Use the persistent **Theme** selector to choose Light, Dark or System on any page. The choice is saved on this browser, follows operating-system changes in System mode, and works without signing in.
+
+Open **Settings → Reports and CSV** to generate an export-authorized current summary, filter by kind/category, optionally include archived rows, download CSV, or print/save PDF through the browser. Reports recompute exact totals from eligible filtered rows; they do not expose view-only records. Unknown values remain unknown and archived records stay out of totals.
+
+Run `npm ci` and restart the app. For production, rebuild before restarting. No new database migration is required from 0.6.0; older releases still need their tracked migrations. Keep environment files and secrets. See [docs/THEMES-AND-REPORTS.md](docs/THEMES-AND-REPORTS.md).

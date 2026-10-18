@@ -1,5 +1,6 @@
 "use client";
 import { NotificationSettings } from "./notification-settings";
+import { Reports } from "./reports";
 import { Brand } from "@/components/brand";
 
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -915,6 +916,22 @@ export function Application({
                         {t.export}
                       </Button>
                     </section>
+                    <Reports
+                      key={`reports:${familyId}`}
+                      familyId={familyId}
+                      locale={locale}
+                      categories={Array.from(
+                        new Map(
+                          data.records.map((r) => [
+                            r.categoryCode,
+                            {
+                              code: r.categoryCode,
+                              name: bn ? r.categoryBn : r.categoryEn,
+                            },
+                          ]),
+                        ).values(),
+                      )}
+                    />
                     <NotificationSettings
                       key={familyId}
                       familyId={familyId}
@@ -947,7 +964,7 @@ export function Application({
                 ? "যত্নে রাখুন, মনে রাখুন।"
                 : "A little care for everything that matters."}
             </span>
-            <span>Version 0.6.0</span>
+            <span>Version 0.7.0</span>
           </footer>
         </main>
       </div>

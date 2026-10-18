@@ -60,3 +60,7 @@ Upload metadata: `{title, description, category, tags, version, documentId?}`. O
 ## Notification preferences (0.6.0)
 
 GET/PUT `/api/families/:familyId/notifications` reads/saves the authenticated member's personal settings. GET also returns the latest 100 personal delivery attempts, filtered by current record permissions. PUT uses an optimistic preference version (0 when absent); it does not accept another recipient or member ID. See NOTIFICATIONS.md for the JSON fields, schedule semantics and status meanings.
+
+## Current reports (0.7.0)
+
+POST `/api/families/:familyId/reports` accepts `{kind:"all"|"asset"|"liability",category:"",includeArchived:false,format:"json"|"csv"}` with those defaults. Reuses current record View+Export checks and an audited repeatable-read snapshot. JSON contains summary/category totals and selected rows; CSV is a no-store UTF-8 attachment. Maximum 5,000 exportable source records; no silent truncation. Unknown fields and unsupported formats are rejected. See THEMES-AND-REPORTS.md.

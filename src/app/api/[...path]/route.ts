@@ -1,3 +1,4 @@
+import { createReport } from "@/server/reports";
 import * as notifications from "@/server/notifications";
 import * as documents from "@/server/documents";
 import { documentForm } from "@/server/document-files";
@@ -31,6 +32,8 @@ async function handler(
         section = path[2],
         id = path[3],
         action = path[4];
+      if (section === "reports" && path.length === 3 && method === "POST")
+        return createReport(db, familyId, actor, await body(request));
       if (section === "notifications" && path.length === 3) {
         if (method === "GET")
           return notifications.notificationSettings(db, familyId, actor);

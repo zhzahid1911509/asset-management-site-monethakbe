@@ -1,3 +1,5 @@
+import { ThemeControl } from "@/components/theme-control";
+import { THEME_BOOTSTRAP } from "@/lib/theme";
 import { InstallApp } from "@/components/install-app";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
@@ -22,11 +24,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
+      </head>
       <body>
         {children}
         <InstallApp />
+        <ThemeControl />
       </body>
     </html>
   );
 }
+
+import "./themes.css";

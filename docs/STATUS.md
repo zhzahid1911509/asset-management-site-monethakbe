@@ -101,3 +101,10 @@ A responsive Bengali home page groups the supplied family, trust and technology 
 Personal email preferences are now opt-in per member/family. The existing worker schedules active authorized reminders, tracks occurrence/interval identities, and rechecks permission/status/preferences immediately before dispatch. Quiet hours, recipient time zones, advance notice and safe delivery-history status are implemented. Messages are deliberately generic; account/invitation mail remains independent.
 
 This supersedes the earlier release notes that described email reminders as unavailable. The full notification specification is not complete: specialized categories, snooze, per-record overrides, push/SMS and delivery webhooks remain pending. See NOTIFICATIONS.md and UPGRADE-0.6.md.
+
+## Version 0.7.0 appearance and reporting
+
+- Light/Dark/System appearance across public and authenticated screens, persisted as a browser-only preference with cross-tab and operating-system updates. Original logo imagery is preserved.
+- Current filtered reports with export-authorized category/record totals, unknown-value counts, archive handling, CSV download and browser print/save-PDF. Each action requests fresh data. Current exports now use repeatable-read snapshots.
+- CSV uses UTF-8 BOM, correct quoting and spreadsheet-formula neutralization. Preview is limited to 100 rows; CSV/print include all selected rows, with a 5,000-exportable-record server cap and explicit error rather than truncation.
+- This supersedes prior notes describing all CSV/PDF presentation and themes as absent. Historical reporting, full history exports, server-generated PDF and backup restoration remain unimplemented. Real-browser visual/accessibility/printing checks remain deployment tasks.

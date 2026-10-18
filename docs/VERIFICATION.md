@@ -83,3 +83,11 @@ Executed with synthetic data and mocked mail transport only:
 - All six tracked migrations were exercised by the PostgreSQL-engine tests; the migration-journal rerun remained idempotent. Existing authentication, invitation, document, ownership, finance, reminder and installation tests passed.
 - Production Next.js build passed.
 - No real emails were sent. No live Neon migration, multiple-worker network/concurrency test, real Resend delivery, browser form interaction or notification inbox placement was verified. These are deployment checks in NOTIFICATIONS.md.
+
+## Version 0.7.0 — appearance and current reports
+
+- Strict TypeScript check passed.
+- **146 tests passed across 13 files**. Twelve new tests exercise theme startup/system changes, explicit persistence, unavailable storage, cross-tab synchronization, exact report totals, archive/filter behavior, membership/export denials, no hidden-record totals, UTF-8 CSV quoting/formula neutralization and strict request validation. Existing migrations, authentication, finance, documents and notification checks continued to pass.
+- Clean production build passed after removing a corrupt generated `.next` cache; the source and database migrations were not reset.
+- Static contrast calculations for the new principal dark-mode pairs: body 14.98:1, muted card text 8.36:1 and primary button text 9.06:1. These three calculations are not a full page-level WCAG audit.
+- Browser rendering, first-paint behavior, native theme inputs, report print pagination, Bengali font rendering and actual PDF output remain unverified in a real browser/device. No live customer data or email service was used.

@@ -665,22 +665,25 @@ export async function savePreferences(
   });
 }
 export async function exportRecords(db: Db, familyId: string, a: Actor) {
-  return db.transaction(async (q) => {
-    const m = await member(q, familyId, a);
-    const all = await readSnapshot(q, familyId, a);
-    const eligible = all.records.filter((r) => r.canExport);
-    if (!eligible.length && !["owner", "administrator"].includes(m.role))
-      throw new AppError("FORBIDDEN", 403);
-    await audit(q, familyId, a, "records.exported");
-    return {
-      formatVersion: 1,
-      exportedAt: new Date().toISOString(),
-      family: all.family,
-      currency: "BDT",
-      scope: "Records this user may view and export; current values only",
-      records: eligible,
-    };
-  });
+  return db.transaction(
+    async (q) => {
+      const m = await member(q, familyId, a);
+      const all = await readSnapshot(q, familyId, a);
+      const eligible = all.records.filter((r) => r.canExport);
+      if (!eligible.length && !["owner", "administrator"].includes(m.role))
+        throw new AppError("FORBIDDEN", 403);
+      await audit(q, familyId, a, "records.exported");
+      return {
+        formatVersion: 1,
+        exportedAt: new Date().toISOString(),
+        family: all.family,
+        currency: "BDT",
+        scope: "Records this user may view and export; current values only",
+        records: eligible,
+      };
+    },
+    { isolationLevel: "repeatable read" },
+  );
 }
 
 export async function recordHistory(
