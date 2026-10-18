@@ -17,7 +17,7 @@ function ReportView({
   return (
     <div className="report-content">
       {printing && (
-        <img src="/brand/logo.jpg" alt="মনে থাকবে" width="140" height="94" />
+        <img src="/brand/logo-light.png" alt="মনে থাকবে" width="140" height="94" />
       )}
       <h2>
         {report.family.name} ·{" "}

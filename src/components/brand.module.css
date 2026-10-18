@@ -1,0 +1,26 @@
+.artwork {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1.57;
+}
+.artwork img {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: transparent;
+  border: 0;
+  filter: none;
+}
+.artwork .light { display: block; }
+.artwork .dark { display: none; }
+:global(html[data-theme="dark"]) .artwork .light { display: none; }
+:global(html[data-theme="dark"]) .artwork .dark { display: block; }
+@media (prefers-color-scheme: dark) {
+  :global(html:not([data-theme])) .artwork .light { display: none; }
+  :global(html:not([data-theme])) .artwork .dark { display: block; }
+}
+@media print {
+  .artwork .light { display: block !important; }
+  .artwork .dark { display: none !important; }
+}
