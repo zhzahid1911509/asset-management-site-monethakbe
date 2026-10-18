@@ -1,3 +1,4 @@
+import type { OwnerEntry } from "../lib/ownership";
 import { sql } from "drizzle-orm";
 import {
   pgTable,
@@ -139,6 +140,10 @@ export const records = pgTable(
       .references(() => catalogTypes.code),
     name: text("name").notNull(),
     notes: text("notes").default("").notNull(),
+    details: jsonb("details")
+      .$type<Record<string, string>>()
+      .default({})
+      .notNull(),
     createdBy: text("created_by")
       .notNull()
       .references(() => user.id),
@@ -165,6 +170,8 @@ export const assets = pgTable(
       scale: 6,
     }).notNull(),
     acquiredOn: date("acquired_on"),
+    owners: jsonb("owners").$type<OwnerEntry[]>().default([]).notNull(),
+    ownershipAsOf: date("ownership_as_of"),
     location: text("location").default("").notNull(),
   },
   (t) => [
@@ -366,5 +373,66 @@ export const liabilityPayments = pgTable(
       "payment_balance_ck",
       sql`${t.balanceAfter} >= 0 and ${t.balanceBefore} < 'Infinity'::numeric and ${t.balanceAfter} = ${t.balanceBefore} - ${t.principal}`,
     ),
+  ],
+);
+
+export const detailHistory = pgTable(
+  "record_detail_history",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    recordId: uuid("record_id").notNull(),
+    recordVersion: integer("record_version").notNull(),
+    schemaVersion: integer("schema_version").default(1).notNull(),
+    details: jsonb("details").$type<Record<string, string>>().notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: time("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.familyId, t.recordId],
+      foreignColumns: [records.familyId, records.id],
+    }),
+    unique("detail_revision_uq").on(t.familyId, t.recordId, t.recordVersion),
+    check("detail_object_ck", sql`jsonb_typeof(${t.details}) = 'object'`),
+    check(
+      "detail_revision_ck",
+      sql`${t.recordVersion} > 0 and ${t.schemaVersion} = 1`,
+    ),
+  ],
+);
+export const ownershipHistory = pgTable(
+  "ownership_history",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    recordId: uuid("record_id").notNull(),
+    recordVersion: integer("record_version").notNull(),
+    familyShare: numeric("family_share", { precision: 9, scale: 6 }).notNull(),
+    owners: jsonb("owners").$type<OwnerEntry[]>().notNull(),
+    asOf: date("as_of"),
+    reason: text("reason").notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: time("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.familyId, t.recordId],
+      foreignColumns: [records.familyId, records.id],
+    }),
+    unique("ownership_revision_uq").on(t.familyId, t.recordId, t.recordVersion),
+    check(
+      "ownership_share_ck",
+      sql`${t.familyShare} >= 0 and ${t.familyShare} <= 100`,
+    ),
+    check(
+      "ownership_owners_ck",
+      sql`jsonb_typeof(${t.owners}) = 'array' and jsonb_array_length(${t.owners}) <= 20`,
+    ),
+    check("ownership_revision_ck", sql`${t.recordVersion} > 0`),
   ],
 );

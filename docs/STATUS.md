@@ -4,7 +4,7 @@ This package implements the first working foundation/core slice. It does not com
 
 ## Verification record
 
-The final accompanying handoff reports the executed checks. Tests run against synthetic data in an embedded PostgreSQL engine, not a connected live Neon project. No real email was sent while building. The production build does not require fake credentials; without required configuration, the app renders a setup screen.
+The final accompanying handoff reports the executed checks. Tests run against synthetic data in an embedded PostgreSQL engine, not a connected live Neon project. No real email was sent while building. The production build does not require fake credentials; the public home page renders without configuration, while authentication/workspace routes require configuration.
 
 A configured deployment still needs a live Neon migration and transaction smoke test, email delivery test, browser E2E/accessibility check, external security review and backup restoration evidence. Do not interpret a successful build as evidence of those checks.
 
@@ -14,12 +14,12 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 | ---------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Money            | BDT only, exact decimals, manual whole-asset valuation and included economic share            | FX snapshots, verified market sources, historical ownership, rounding policies by currency                             |
 | Liabilities      | Outstanding balance, principal/interest/fee payments, history; archive/restore                | Schedules, balance reconciliation and audited payment reversals                                                        |
-| Ownership        | One included family economic percentage                                                       | Co-owner parties, legal/beneficial distinctions and dated share histories                                              |
+| Ownership        | Co-owner roles, separate legal/economic shares, dated share revisions                         | Historical net-worth reports, party/member linking and ownership transfer workflows                                    |
 | Permissions      | Fixed role defaults, explicit per-record allow/deny; owner-only invitations/grants/revocation | Custom roles, admin delegation, time-limited grants, transfer/recovery workflows                                       |
 | Membership       | One-time verified-email invitation, expiry, revocation                                        | Re-invitation/reactivation of revoked members and role changes                                                         |
 | Audit            | Append entries transactionally; no audit UI                                                   | Dedicated immutable application DB grants, audit viewing/retention and operational export                              |
-| Export           | Current visible/exportable record JSON                                                        | Full history archive, CSV/PDF, asynchronous jobs and restoration                                                       |
-| Catalog          | 131 seeded types, common asset form                                                           | Category-specific typed forms and editable family catalog                                                              |
+| Export           | Current visible/exportable record JSON including details and owners                           | Full history archive, CSV/PDF, asynchronous jobs and restoration                                                       |
+| Catalog          | 131 seeded types, optional typed fields across all 14 categories                              | Editable family catalog, custom fields and guided multi-step forms                                                     |
 | AI               | Not implemented; no key-entry controls                                                        | KMS envelopes, adapters, budgets, failover and confirmation tools                                                      |
 | Documents/Drive  | Not implemented                                                                               | Private storage, scanning, metadata lifecycle, OAuth and reconciler                                                    |
 | Notifications    | Auth/invitation email queue only                                                              | Reminder categories, quiet hours and recurrence                                                                        |
@@ -46,7 +46,7 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 
 ## Next deliverable
 
-Continue with category-specific asset forms, co-owners, payment corrections/reconciliation, document metadata/storage, broader localization and browser tests. Preserve current permission checks and the exact-money contract. Add AI only through the planned server-side secret boundary; never use browser-stored keys.
+Continue with payment corrections/reconciliation, document metadata/storage, reminders, broader localization and browser tests. Preserve current permission checks and the exact-money contract. Add AI only through the planned server-side secret boundary; never use browser-stored keys.
 
 Version 0.1.1 starts the mail worker alongside Next.js with `npm run dev`. Production `npm start` still requires `npm run worker:email` separately. Permanent provider 4xx errors stop retries; HTTP 429 and 5xx can retry, respecting Retry-After. Worker logs classify errors without printing recipients, verification links or provider response bodies.
 
@@ -57,3 +57,15 @@ Repayments and on-screen valuation/payment history are implemented end to end. P
 ## Version 0.2.1 presentation update
 
 A responsive Bengali home page groups the supplied family, trust and technology taglines, with English supporting copy. It links to working authentication routes and labels document uploads, reminders and AI as upcoming. Password visibility toggles are available for sign-in, sign-up and reset, hidden initially and reset to hidden when changing modes.
+
+## Version 0.3.0 category and ownership increment
+
+- All 14 seeded categories have optional structured fields validated on the server and in the entry UI. Details can be added during creation and edited later. Revision snapshots are retained and view-authorized.
+- Property fields include division/district/upazila, mouza/JL/dag/khatian/deed/namjari/tax references and area. Katha/bigha entries require a local definition/source. Units are recorded without automatic conversion.
+- Account/policy/licence references use last-four-only inputs. These fields do not accept full account credentials. Arbitrary category keys are rejected.
+- Ownership records support legal owners, beneficial owners, combined owners, managers and possessors. Legal and economic totals are validated separately. Managers/possessors have no ownership percentages. Parties do not grant user access.
+- An explicit family economic share drives current totals exactly once. When parties are listed, their included economic shares must sum exactly to that share. Without parties, a manual family share remains allowed. Unknown legal shares remain unknown.
+- Ownership updates carry a non-future effective date and reason; backdating before the latest effective date is rejected. The migration retains the pre-upgrade share with an unknown effective date. This does not implement historical net-worth reports, legal validation or automatic inheritance calculations.
+- Category and ownership updates are version-checked, idempotent and audited transactionally. Archived records show history but cannot receive these updates.
+- Current JSON export includes current details/owners; complete history exports are still pending. History screens display the latest 100 revisions per kind and disclose the limit.
+- Forms preserve drafts in memory on failures; automatic recovery after browser reload is still pending. Some enumerated option values remain English.

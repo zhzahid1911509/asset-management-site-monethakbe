@@ -56,6 +56,8 @@ async function handler(
             await body(request),
             key,
           );
+        if (path.length === 5 && action === "metadata" && method === "GET")
+          return service.recordMetadata(db, familyId, actor, id);
         if (path.length === 5 && action === "history" && method === "GET")
           return service.recordHistory(db, familyId, actor, id);
         if (path.length === 4 && method === "PATCH")
@@ -68,6 +70,24 @@ async function handler(
             key,
           );
         if (path.length === 5 && method === "POST") {
+          if (action === "details")
+            return service.saveDetails(
+              db,
+              familyId,
+              actor,
+              id,
+              await body(request),
+              key,
+            );
+          if (action === "ownership")
+            return service.saveOwnership(
+              db,
+              familyId,
+              actor,
+              id,
+              await body(request),
+              key,
+            );
           if (action === "payments")
             return service.addPayment(
               db,

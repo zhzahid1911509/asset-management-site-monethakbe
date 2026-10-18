@@ -1890,3 +1890,81 @@ thead {
     order: 3;
   }
 }
+
+.category-disclosure {
+  margin-bottom: 22px;
+}
+.category-disclosure summary,
+.metadata-revision summary {
+  cursor: pointer;
+  padding-block: 12px;
+  font-weight: 600;
+}
+.category-disclosure > div {
+  margin-top: 12px;
+}
+.metadata-values {
+  margin: 12px 0;
+  display: grid;
+  gap: 10px;
+}
+.metadata-values > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+}
+.metadata-values dt {
+  color: #596b5e;
+}
+.metadata-values dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.owner-editor {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+  margin-block: 18px;
+  min-width: 0;
+}
+.owner-editor legend {
+  padding-inline: 6px;
+  font-weight: 600;
+}
+.owner-check {
+  flex-direction: row;
+  align-items: center;
+}
+.ownership-controls {
+  margin-top: 20px;
+}
+.owner-list {
+  padding-left: 20px;
+}
+.owner-list li {
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+.metadata-revision {
+  border-bottom: 1px solid var(--line);
+  padding-block: 8px;
+}
+.metadata-revision small {
+  display: block;
+  color: #596b5e;
+  margin-bottom: 10px;
+}
+.record-metadata .muted {
+  margin-block: 10px 18px;
+}
+.record-metadata .fine-print {
+  margin-bottom: 18px;
+}
+@media (max-width: 480px) {
+  .metadata-values > div {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+}

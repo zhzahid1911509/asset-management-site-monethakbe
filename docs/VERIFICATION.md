@@ -33,3 +33,12 @@ Implementation references consulted: https://orm.drizzle.team/docs/transactions 
 Production build and its strict TypeScript step passed after the home-page and password-control changes. HTTP smoke checks returned 200 for `/`, `/auth` and `/auth?mode=signup`, with the expected headline and initially masked password control in server-rendered HTML. The local smoke server used synthetic configuration and performed no login, database mutation or email send.
 
 Browser interaction and screenshot checks were attempted but could not run: no browser binary was installed and the Chromium download failed. Responsive breakpoints, focus styles and button semantics were reviewed in source; visual layout and Show/Hide interaction still need a browser acceptance check. The previous 49-test finance/backend suite was not rerun for this UI-only release.
+
+## Version 0.3.0 verification — 18 October 2026
+
+- Strict TypeScript check and production build: passed.
+- Automated tests: 65 passed across 5 files, including 16 new category/ownership/migration tests.
+- Coverage: all 14 category definitions; unknown-key, date, last-four and land-unit validation; creation/history atomicity; exact legal/economic shares; baseline preservation; idempotency and stale versions; view/edit/export boundaries; archived/liability restrictions; competing writes; audit-failure rollback.
+- Populated upgrade test: applies 0000/0001, inserts a legacy asset with a 12.345678% share and version 7, applies 0002, then checks unchanged values and an unknown effective ownership date.
+- Browser interaction, live Neon migrations and provider integrations were not exercised for this release. Existing browser runtime remains unavailable following the prior download failure.
+- Official implementation references: https://orm.drizzle.team/docs/column-types and https://orm.drizzle.team/docs/transactions and https://zod.dev/api .

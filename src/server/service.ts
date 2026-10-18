@@ -13,6 +13,8 @@ import {
   role,
 } from "../lib/validation";
 import Decimal from "decimal.js";
+import { parseDetails } from "../lib/record-details";
+import { ownershipInput } from "../lib/ownership";
 import { paymentInput } from "../lib/validation";
 import { totals } from "../lib/money";
 import { seal } from "./secrets";
@@ -211,6 +213,8 @@ async function readSnapshot(q: Query, familyId: string, a: Actor) {
             ? (v?.amount ?? null)
             : (liability?.outstanding ?? null),
         ownershipPercent: asset?.ownershipPercent ?? "100",
+        owners: asset?.owners ?? [],
+        ownershipAsOf: asset?.ownershipAsOf ?? null,
         location: asset?.location ?? "",
         lender: liability?.lender ?? "",
         valuationDate:
@@ -263,6 +267,7 @@ export async function createRecord(
       .from(s.catalogTypes)
       .where(eq(s.catalogTypes.code, data.typeCode));
     if (!type || type.kind !== data.kind) throw new AppError("INVALID_TYPE");
+    const details = parseDetails(type.categoryCode, data.details);
     const [r] = await q
       .insert(s.records)
       .values({
@@ -271,6 +276,7 @@ export async function createRecord(
         typeCode: data.typeCode,
         name: data.name,
         notes: data.notes,
+        details,
         createdBy: a.id,
       })
       .returning();
@@ -298,6 +304,27 @@ export async function createRecord(
         lender: data.lender,
         balanceAsOf: data.asOf,
       });
+    await q
+      .insert(s.detailHistory)
+      .values({
+        familyId,
+        recordId: r.id,
+        recordVersion: 1,
+        details,
+        createdBy: a.id,
+      });
+    if (data.kind === "asset")
+      await q
+        .insert(s.ownershipHistory)
+        .values({
+          familyId,
+          recordId: r.id,
+          recordVersion: 1,
+          familyShare: data.ownershipPercent,
+          owners: [],
+          reason: "Initial family share; effective date not specified",
+          createdBy: a.id,
+        });
     await q.insert(s.recordGrants).values(
       ["view", "edit"].map((action) => ({
         familyId,
@@ -756,20 +783,18 @@ export async function addPayment(
       if (data.paidOn < balance.balanceAsOf) throw new AppError("PAYMENT_DATE");
       const after = new Decimal(balance.outstanding).minus(data.principal);
       if (after.isNegative()) throw new AppError("OVERPAYMENT");
-      await q
-        .insert(s.liabilityPayments)
-        .values({
-          familyId,
-          recordId: id,
-          principal: data.principal,
-          interest: data.interest,
-          fees: data.fees,
-          paidOn: data.paidOn,
-          note: data.note,
-          balanceBefore: balance.outstanding,
-          balanceAfter: after.toFixed(2),
-          createdBy: a.id,
-        });
+      await q.insert(s.liabilityPayments).values({
+        familyId,
+        recordId: id,
+        principal: data.principal,
+        interest: data.interest,
+        fees: data.fees,
+        paidOn: data.paidOn,
+        note: data.note,
+        balanceBefore: balance.outstanding,
+        balanceAfter: after.toFixed(2),
+        createdBy: a.id,
+      });
       await q
         .update(s.liabilities)
         .set({ outstanding: after.toFixed(2), balanceAsOf: data.paidOn })
@@ -780,6 +805,170 @@ export async function addPayment(
           ),
         );
       await audit(q, familyId, a, "liability.payment.recorded", id);
+      return { id };
+    },
+  );
+}
+
+export async function recordMetadata(
+  db: Db,
+  familyId: string,
+  a: Actor,
+  id: string,
+) {
+  return db.transaction(async (q) => {
+    const { r } = await authorized(q, familyId, a, id, "view");
+    const detailRows = await q
+      .select()
+      .from(s.detailHistory)
+      .where(
+        and(
+          eq(s.detailHistory.familyId, familyId),
+          eq(s.detailHistory.recordId, id),
+        ),
+      )
+      .orderBy(desc(s.detailHistory.recordVersion))
+      .limit(101);
+    const ownershipRows =
+      r.kind === "asset"
+        ? await q
+            .select()
+            .from(s.ownershipHistory)
+            .where(
+              and(
+                eq(s.ownershipHistory.familyId, familyId),
+                eq(s.ownershipHistory.recordId, id),
+              ),
+            )
+            .orderBy(desc(s.ownershipHistory.recordVersion))
+            .limit(101)
+        : [];
+    return {
+      detailHistory: detailRows.slice(0, 100),
+      ownershipHistory: ownershipRows.slice(0, 100),
+      hasMore: detailRows.length > 100 || ownershipRows.length > 100,
+    };
+  });
+}
+export async function saveDetails(
+  db: Db,
+  familyId: string,
+  a: Actor,
+  id: string,
+  input: unknown,
+  key: string,
+) {
+  const data = z
+    .strictObject({
+      version: z.number().int().positive(),
+      details: z.record(z.string(), z.string().max(250)),
+    })
+    .parse(input);
+  return mutate(
+    db,
+    familyId,
+    a,
+    key,
+    { action: "details", id, data },
+    async (q) => {
+      const { r } = await authorized(q, familyId, a, id, "edit");
+      const [type] = await q
+        .select()
+        .from(s.catalogTypes)
+        .where(eq(s.catalogTypes.code, r.typeCode));
+      const details = parseDetails(type.categoryCode, data.details);
+      const [updated] = await q
+        .update(s.records)
+        .set({
+          details,
+          version: sql`${s.records.version}+1`,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(s.records.familyId, familyId),
+            eq(s.records.id, id),
+            eq(s.records.version, data.version),
+            eq(s.records.archived, false),
+          ),
+        )
+        .returning();
+      if (!updated) throw new AppError("CONFLICT", 409);
+      await q
+        .insert(s.detailHistory)
+        .values({
+          familyId,
+          recordId: id,
+          recordVersion: updated.version,
+          details,
+          createdBy: a.id,
+        });
+      await audit(q, familyId, a, "record.details.updated", id);
+      return { id };
+    },
+  );
+}
+export async function saveOwnership(
+  db: Db,
+  familyId: string,
+  a: Actor,
+  id: string,
+  input: unknown,
+  key: string,
+) {
+  const data = ownershipInput.parse(input);
+  if (data.asOf > today()) throw new AppError("OWNERSHIP_DATE");
+  return mutate(
+    db,
+    familyId,
+    a,
+    key,
+    { action: "ownership", id, data },
+    async (q) => {
+      const { r } = await authorized(q, familyId, a, id, "edit");
+      if (r.kind !== "asset") throw new AppError("INVALID_TYPE");
+      const [updated] = await q
+        .update(s.records)
+        .set({ version: sql`${s.records.version}+1`, updatedAt: new Date() })
+        .where(
+          and(
+            eq(s.records.familyId, familyId),
+            eq(s.records.id, id),
+            eq(s.records.version, data.version),
+            eq(s.records.archived, false),
+          ),
+        )
+        .returning();
+      if (!updated) throw new AppError("CONFLICT", 409);
+      const [asset] = await q
+        .select()
+        .from(s.assets)
+        .where(and(eq(s.assets.familyId, familyId), eq(s.assets.recordId, id)))
+        .for("update");
+      if (!asset) throw new AppError("INVALID_TYPE");
+      if (asset.ownershipAsOf && data.asOf < asset.ownershipAsOf)
+        throw new AppError("OWNERSHIP_DATE");
+      await q
+        .update(s.assets)
+        .set({
+          ownershipPercent: data.familyShare,
+          owners: data.owners,
+          ownershipAsOf: data.asOf,
+        })
+        .where(and(eq(s.assets.familyId, familyId), eq(s.assets.recordId, id)));
+      await q
+        .insert(s.ownershipHistory)
+        .values({
+          familyId,
+          recordId: id,
+          recordVersion: updated.version,
+          familyShare: data.familyShare,
+          owners: data.owners,
+          asOf: data.asOf,
+          reason: data.reason,
+          createdBy: a.id,
+        });
+      await audit(q, familyId, a, "asset.ownership.updated", id);
       return { id };
     },
   );

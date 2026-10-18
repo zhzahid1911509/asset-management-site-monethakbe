@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.2.1 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.3.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -11,12 +11,13 @@ A runnable **Next.js 16 / React / strict TypeScript** application for the first 
 - Multi-family workspaces; owner creation; six role names; active/expired/revoked membership checks.
 - Owner-issued, email-bound, one-use invitations; 48-hour invitation expiry; 30-day adviser access.
 - Per-record view/edit/export grants and denies, family isolation and immediate membership revocation checks.
-- All 131 catalog types, with English and Bengali names; no user/demo assets seeded.
+- All 131 catalog types, with English and Bengali names; optional validated category-specific fields for all 14 categories.
+- Co-owner, beneficiary, manager and possessor records; separate legal/economic shares, dated family-share updates and revision history.
 - Asset creation, name/notes editing, append-only valuations, archive/restore, ownership-adjusted totals.
 - Liability repayments with separate principal, interest and fees, exact outstanding balances, append-only application payment entries and record-level financial history.
 - BDT exact-decimal calculations, missing-value states, permission-filtered dashboard and category counts.
 - Search/filtering, family switching, responsive layout, English/Bengali primary UI, Simple/Advanced preferences.
-- Authorized JSON current-record export and audit entries for mutations/exports.
+- Authorized JSON current-record export including category details and current ownership; audit entries for mutations/exports.
 - Transactional idempotency for record creation, edits, valuation, repayments and archive/restore; optimistic record versions.
 - Durable encrypted email queue and a Resend worker with bounded retries, job leases, fencing and idempotency keys.
 - Drizzle schema, generated SQL migration, versioned catalog seed, meaningful PostgreSQL-engine integration tests and authentication tests.
@@ -115,3 +116,7 @@ See [docs/UPGRADE-0.2.md](docs/UPGRADE-0.2.md). This release requires the new tr
 ## Version 0.2.1 — home and authentication UI
 
 The public `/` route now shows the Bengali family-first home page. `/app` remains the workspace and `/auth` retains the configuration checks. Sign-in, sign-up and reset-password forms have keyboard-accessible Show/Hide controls. Home-page registration links open `/auth?mode=signup`. No database migration is added in 0.2.1; upgrading from 0.1.x still requires the 0.2.0 migration.
+
+## Upgrade to 0.3.0
+
+See [docs/UPGRADE-0.3.md](docs/UPGRADE-0.3.md). Apply the additive migration before starting the new app. It preserves current records and creates baseline detail/ownership history without inventing historical ownership dates.

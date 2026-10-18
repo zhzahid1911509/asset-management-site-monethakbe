@@ -7,6 +7,8 @@ export class AppError extends Error {
   }
 }
 export const safeMessages: Record<string, string> = {
+  OWNERSHIP_DATE:
+    "Use a date on or after the latest ownership date and no later than today.",
   PAYMENT_DATE:
     "Payment date must be on or after the recorded balance date and cannot be in the future.",
   EMPTY_PAYMENT:

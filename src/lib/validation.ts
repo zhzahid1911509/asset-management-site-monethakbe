@@ -26,6 +26,7 @@ export const recordInput = z
     typeCode: z.string().min(1).max(100),
     name: z.string().trim().min(2).max(160),
     notes: z.string().max(3000).default(""),
+    details: z.record(z.string(), z.string().max(250)).default({}),
     amount: money.optional(),
     ownershipPercent: share.default("100"),
     asOf: date,

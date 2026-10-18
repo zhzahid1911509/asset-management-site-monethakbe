@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { recordInput } from "@/lib/validation";
 import { api, errorText } from "@/lib/client";
+import { CategoryFields } from "./category-fields";
+import { parseDetails } from "@/lib/record-details";
 import { Button } from "./button";
 export type CatalogType = {
   code: string;
@@ -28,7 +30,10 @@ export function AssetForm({
   locale: string;
   onSaved: () => void;
 }) {
-  const key = useRef(crypto.randomUUID()),
+  const request = useRef({ fingerprint: "", key: crypto.randomUUID() }),
+    [categoryDrafts, setCategoryDrafts] = useState<
+      Record<string, Record<string, string>>
+    >({}),
     [error, setError] = useState("");
   const f = useForm<
     z.input<typeof recordInput>,
@@ -51,16 +56,37 @@ export function AssetForm({
     },
   });
   const bn = locale === "bn";
+  const category =
+    catalog.find((c) => c.code === f.watch("typeCode"))?.categoryCode ?? "";
   return (
     <form
       className="record-form"
       onSubmit={f.handleSubmit(async (data) => {
         setError("");
         try {
-          await api(`families/${familyId}/records`, "POST", data, key.current);
+          const details = parseDetails(
+            category,
+            categoryDrafts[category] ?? {},
+          );
+          const payload = { ...data, details };
+          const fingerprint = JSON.stringify(payload);
+          if (request.current.fingerprint !== fingerprint)
+            request.current = { fingerprint, key: crypto.randomUUID() };
+          await api(
+            `families/${familyId}/records`,
+            "POST",
+            payload,
+            request.current.key,
+          );
           onSaved();
         } catch (e) {
-          setError(errorText(e));
+          setError(
+            e instanceof z.ZodError
+              ? e.issues
+                  .map((i) => `${i.path.join(".")}: ${i.message}`)
+                  .join(" · ")
+              : errorText(e),
+          );
         }
       })}
     >
@@ -181,6 +207,24 @@ export function AssetForm({
           {bn ? "ঋণদাতা" : "Lender"}
           <input {...f.register("lender")} />
         </label>
+      )}
+      {category && (
+        <details className="section-form category-disclosure">
+          <summary>
+            {bn
+              ? "ধরন অনুযায়ী অতিরিক্ত তথ্য (ঐচ্ছিক)"
+              : "Category details (optional)"}
+          </summary>
+          <CategoryFields
+            category={category}
+            values={categoryDrafts[category] ?? {}}
+            onChange={(values) =>
+              setCategoryDrafts((old) => ({ ...old, [category]: values }))
+            }
+            locale={locale}
+            disabled={f.formState.isSubmitting}
+          />
+        </details>
       )}
       <label>
         {bn ? "নোট" : "Notes"}
