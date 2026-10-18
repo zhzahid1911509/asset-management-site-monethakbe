@@ -1968,3 +1968,78 @@ thead {
     gap: 3px;
   }
 }
+
+.reminders-panel {
+  padding: 26px;
+}
+.reminders-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+.reminders-toolbar,
+.reminder-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-block: 18px;
+}
+.reminder-form {
+  padding: 20px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-block: 24px;
+}
+.reminder-form fieldset {
+  border: 0;
+  padding: 0;
+  margin-top: 16px;
+  min-width: 0;
+}
+.reminder-form .fine-print {
+  margin-bottom: 18px;
+}
+.reminder-filter {
+  max-width: 240px;
+}
+.reminder-list {
+  display: grid;
+  gap: 16px;
+}
+.reminder-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+  overflow-wrap: anywhere;
+}
+.reminder-card > p {
+  margin-block: 8px;
+}
+.reminder-history li {
+  margin-bottom: 12px;
+}
+.reminder-history small {
+  color: #596b5e;
+}
+.payment-correction {
+  margin-top: 12px;
+}
+.payment-correction summary {
+  cursor: pointer;
+  padding-block: 10px;
+  font-weight: 600;
+}
+.payment-correction form {
+  margin-top: 14px;
+}
+@media (max-width: 600px) {
+  .reminders-panel {
+    padding: 16px;
+  }
+  .reminders-heading {
+    flex-wrap: wrap;
+  }
+}

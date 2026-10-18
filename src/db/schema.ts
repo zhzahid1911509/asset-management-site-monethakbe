@@ -365,6 +365,7 @@ export const liabilityPayments = pgTable(
       foreignColumns: [records.familyId, records.id],
     }),
     index("payment_history_idx").on(t.familyId, t.recordId, t.paidOn),
+    unique("payment_family_record_uq").on(t.familyId, t.recordId, t.id),
     check(
       "payment_amounts_ck",
       sql`${t.principal} >= 0 and ${t.interest} >= 0 and ${t.fees} >= 0 and ${t.principal} < 'Infinity'::numeric and ${t.interest} < 'Infinity'::numeric and ${t.fees} < 'Infinity'::numeric and ${t.principal} + ${t.interest} + ${t.fees} > 0`,
@@ -434,5 +435,126 @@ export const ownershipHistory = pgTable(
       sql`jsonb_typeof(${t.owners}) = 'array' and jsonb_array_length(${t.owners}) <= 20`,
     ),
     check("ownership_revision_ck", sql`${t.recordVersion} > 0`),
+  ],
+);
+
+export const paymentReversals = pgTable(
+  "payment_reversals",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    recordId: uuid("record_id").notNull(),
+    paymentId: uuid("payment_id").notNull().unique(),
+    principal: numeric("principal", { precision: 24, scale: 2 }).notNull(),
+    balanceBefore: numeric("balance_before", {
+      precision: 24,
+      scale: 2,
+    }).notNull(),
+    balanceAfter: numeric("balance_after", {
+      precision: 24,
+      scale: 2,
+    }).notNull(),
+    reversedOn: date("reversed_on").notNull(),
+    reason: text("reason").notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: time("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.familyId, t.recordId, t.paymentId],
+      foreignColumns: [
+        liabilityPayments.familyId,
+        liabilityPayments.recordId,
+        liabilityPayments.id,
+      ],
+    }),
+    check(
+      "reversal_balance_ck",
+      sql`${t.principal} >= 0 and ${t.balanceBefore} >= 0 and ${t.balanceAfter} < 'Infinity'::numeric and ${t.balanceAfter} = ${t.balanceBefore} + ${t.principal}`,
+    ),
+  ],
+);
+export const reminders = pgTable(
+  "reminders",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    recordId: uuid("record_id").notNull(),
+    title: text("title").notNull(),
+    category: text("category").notNull(),
+    dueOn: date("due_on").notNull(),
+    recurrence: text("recurrence").notNull(),
+    anchorDay: integer("anchor_day").notNull(),
+    note: text("note").default("").notNull(),
+    status: text("status").default("active").notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: time("created_at").defaultNow().notNull(),
+    updatedAt: time("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.familyId, t.recordId],
+      foreignColumns: [records.familyId, records.id],
+    }),
+    unique("reminder_family_record_uq").on(t.familyId, t.recordId, t.id),
+    index("reminder_due_idx").on(t.familyId, t.status, t.dueOn),
+    check("reminder_anchor_ck", sql`${t.anchorDay} between 1 and 31`),
+    check(
+      "reminder_status_ck",
+      sql`${t.status} in ('active','completed','cancelled')`,
+    ),
+    check(
+      "reminder_category_ck",
+      sql`${t.category} in ('maturity','renewal','payment','maintenance','valuation','family-task','other')`,
+    ),
+    check(
+      "reminder_recurrence_ck",
+      sql`${t.recurrence} in ('none','daily','weekly','monthly','quarterly','yearly')`,
+    ),
+  ],
+);
+export const reminderEvents = pgTable(
+  "reminder_events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    recordId: uuid("record_id").notNull(),
+    reminderId: uuid("reminder_id").notNull(),
+    recordVersion: integer("record_version").notNull(),
+    action: text("action").notNull(),
+    snapshot: jsonb("snapshot")
+      .$type<{
+        title: string;
+        category: string;
+        dueOn: string;
+        recurrence: string;
+        anchorDay: number;
+        note: string;
+        status: string;
+      }>()
+      .notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: time("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.familyId, t.recordId, t.reminderId],
+      foreignColumns: [reminders.familyId, reminders.recordId, reminders.id],
+    }),
+    unique("reminder_event_version_uq").on(
+      t.familyId,
+      t.recordId,
+      t.recordVersion,
+    ),
+    check(
+      "reminder_event_action_ck",
+      sql`${t.action} in ('created','updated','complete','cancel','reopen')`,
+    ),
   ],
 );

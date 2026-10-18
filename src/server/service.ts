@@ -1,4 +1,4 @@
-import { and, eq, desc, sql } from "drizzle-orm";
+import { and, eq, desc, asc, sql } from "drizzle-orm";
 import { createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
 import type { Db } from "../db";
@@ -15,6 +15,13 @@ import {
 import Decimal from "decimal.js";
 import { parseDetails } from "../lib/record-details";
 import { ownershipInput } from "../lib/ownership";
+import {
+  reminderInput,
+  reminderActionInput,
+  nextDueDate,
+  type Recurrence,
+} from "../lib/reminders";
+import { reversalInput } from "../lib/validation";
 import { paymentInput } from "../lib/validation";
 import { totals } from "../lib/money";
 import { seal } from "./secrets";
@@ -304,27 +311,23 @@ export async function createRecord(
         lender: data.lender,
         balanceAsOf: data.asOf,
       });
-    await q
-      .insert(s.detailHistory)
-      .values({
+    await q.insert(s.detailHistory).values({
+      familyId,
+      recordId: r.id,
+      recordVersion: 1,
+      details,
+      createdBy: a.id,
+    });
+    if (data.kind === "asset")
+      await q.insert(s.ownershipHistory).values({
         familyId,
         recordId: r.id,
         recordVersion: 1,
-        details,
+        familyShare: data.ownershipPercent,
+        owners: [],
+        reason: "Initial family share; effective date not specified",
         createdBy: a.id,
       });
-    if (data.kind === "asset")
-      await q
-        .insert(s.ownershipHistory)
-        .values({
-          familyId,
-          recordId: r.id,
-          recordVersion: 1,
-          familyShare: data.ownershipPercent,
-          owners: [],
-          reason: "Initial family share; effective date not specified",
-          createdBy: a.id,
-        });
     await q.insert(s.recordGrants).values(
       ["view", "edit"].map((action) => ({
         familyId,
@@ -712,8 +715,19 @@ export async function recordHistory(
     const payments =
       r.kind === "liability"
         ? await q
-            .select()
+            .select({
+              payment: s.liabilityPayments,
+              reversal: s.paymentReversals,
+            })
             .from(s.liabilityPayments)
+            .leftJoin(
+              s.paymentReversals,
+              and(
+                eq(s.paymentReversals.familyId, s.liabilityPayments.familyId),
+                eq(s.paymentReversals.recordId, s.liabilityPayments.recordId),
+                eq(s.paymentReversals.paymentId, s.liabilityPayments.id),
+              ),
+            )
             .where(
               and(
                 eq(s.liabilityPayments.familyId, familyId),
@@ -729,7 +743,9 @@ export async function recordHistory(
         : [];
     return {
       valuations: valuations.slice(0, 100),
-      payments: payments.slice(0, 100),
+      payments: payments
+        .slice(0, 100)
+        .map(({ payment, reversal }) => ({ ...payment, reversal })),
       hasMore: valuations.length > 100 || payments.length > 100,
     };
   });
@@ -894,15 +910,13 @@ export async function saveDetails(
         )
         .returning();
       if (!updated) throw new AppError("CONFLICT", 409);
-      await q
-        .insert(s.detailHistory)
-        .values({
-          familyId,
-          recordId: id,
-          recordVersion: updated.version,
-          details,
-          createdBy: a.id,
-        });
+      await q.insert(s.detailHistory).values({
+        familyId,
+        recordId: id,
+        recordVersion: updated.version,
+        details,
+        createdBy: a.id,
+      });
       await audit(q, familyId, a, "record.details.updated", id);
       return { id };
     },
@@ -956,20 +970,347 @@ export async function saveOwnership(
           ownershipAsOf: data.asOf,
         })
         .where(and(eq(s.assets.familyId, familyId), eq(s.assets.recordId, id)));
-      await q
-        .insert(s.ownershipHistory)
-        .values({
-          familyId,
-          recordId: id,
-          recordVersion: updated.version,
-          familyShare: data.familyShare,
-          owners: data.owners,
-          asOf: data.asOf,
-          reason: data.reason,
-          createdBy: a.id,
-        });
+      await q.insert(s.ownershipHistory).values({
+        familyId,
+        recordId: id,
+        recordVersion: updated.version,
+        familyShare: data.familyShare,
+        owners: data.owners,
+        asOf: data.asOf,
+        reason: data.reason,
+        createdBy: a.id,
+      });
       await audit(q, familyId, a, "asset.ownership.updated", id);
       return { id };
     },
   );
+}
+
+async function bumpActiveRecord(
+  q: Tx,
+  familyId: string,
+  id: string,
+  version: number,
+) {
+  const [updated] = await q
+    .update(s.records)
+    .set({ version: sql`${s.records.version}+1`, updatedAt: new Date() })
+    .where(
+      and(
+        eq(s.records.familyId, familyId),
+        eq(s.records.id, id),
+        eq(s.records.version, version),
+        eq(s.records.archived, false),
+      ),
+    )
+    .returning();
+  if (!updated) throw new AppError("CONFLICT", 409);
+  return updated;
+}
+export async function reversePayment(
+  db: Db,
+  familyId: string,
+  a: Actor,
+  id: string,
+  input: unknown,
+  key: string,
+) {
+  const data = reversalInput.parse(input);
+  if (data.reversedOn > today()) throw new AppError("REVERSAL_DATE");
+  return mutate(
+    db,
+    familyId,
+    a,
+    key,
+    { action: "reverse-payment", id, data },
+    async (q) => {
+      const { r } = await authorized(q, familyId, a, id, "edit");
+      if (r.kind !== "liability") throw new AppError("INVALID_TYPE");
+      await bumpActiveRecord(q, familyId, id, data.version);
+      const [payment] = await q
+        .select()
+        .from(s.liabilityPayments)
+        .where(
+          and(
+            eq(s.liabilityPayments.familyId, familyId),
+            eq(s.liabilityPayments.recordId, id),
+            eq(s.liabilityPayments.id, data.paymentId),
+          ),
+        );
+      if (!payment) throw new AppError("NOT_FOUND", 404);
+      const [old] = await q
+        .select()
+        .from(s.paymentReversals)
+        .where(eq(s.paymentReversals.paymentId, data.paymentId));
+      if (old) throw new AppError("ALREADY_REVERSED", 409);
+      const [balance] = await q
+        .select()
+        .from(s.liabilities)
+        .where(
+          and(
+            eq(s.liabilities.familyId, familyId),
+            eq(s.liabilities.recordId, id),
+          ),
+        )
+        .for("update");
+      if (
+        data.reversedOn < balance.balanceAsOf ||
+        data.reversedOn < payment.paidOn
+      )
+        throw new AppError("REVERSAL_DATE");
+      const after = new Decimal(balance.outstanding)
+        .plus(payment.principal)
+        .toFixed(2);
+      await q
+        .insert(s.paymentReversals)
+        .values({
+          familyId,
+          recordId: id,
+          paymentId: payment.id,
+          principal: payment.principal,
+          balanceBefore: balance.outstanding,
+          balanceAfter: after,
+          reversedOn: data.reversedOn,
+          reason: data.reason,
+          createdBy: a.id,
+        });
+      await q
+        .update(s.liabilities)
+        .set({ outstanding: after, balanceAsOf: data.reversedOn })
+        .where(
+          and(
+            eq(s.liabilities.familyId, familyId),
+            eq(s.liabilities.recordId, id),
+          ),
+        );
+      await audit(q, familyId, a, "liability.payment.reversed", id);
+      return { id };
+    },
+  );
+}
+function reminderState(r: typeof s.reminders.$inferSelect) {
+  return {
+    title: r.title,
+    category: r.category,
+    dueOn: r.dueOn,
+    recurrence: r.recurrence,
+    anchorDay: r.anchorDay,
+    note: r.note,
+    status: r.status,
+  };
+}
+export async function listReminders(db: Db, familyId: string, a: Actor) {
+  return db.transaction(async (q) => {
+    const m = await member(q, familyId, a);
+    const grants = await q
+      .select()
+      .from(s.recordGrants)
+      .where(
+        and(
+          eq(s.recordGrants.familyId, familyId),
+          eq(s.recordGrants.membershipId, m.id),
+        ),
+      );
+    const rows = await q
+      .select({ reminder: s.reminders, record: s.records })
+      .from(s.reminders)
+      .innerJoin(
+        s.records,
+        and(
+          eq(s.records.familyId, s.reminders.familyId),
+          eq(s.records.id, s.reminders.recordId),
+        ),
+      )
+      .where(eq(s.reminders.familyId, familyId))
+      .orderBy(asc(s.reminders.dueOn), asc(s.reminders.id));
+    const visible = rows.filter(({ record }) => can(m, record, "view", grants));
+    return {
+      today: today(),
+      reminders: visible.map(({ reminder, record }) => ({
+        ...reminder,
+        recordName: record.name,
+        recordVersion: record.version,
+        archived: record.archived,
+        canEdit: !record.archived && can(m, record, "edit", grants),
+      })),
+    };
+  });
+}
+export async function saveReminder(
+  db: Db,
+  familyId: string,
+  a: Actor,
+  id: string,
+  input: unknown,
+  key: string,
+) {
+  const data = reminderInput.parse(input);
+  return mutate(
+    db,
+    familyId,
+    a,
+    key,
+    { action: "save-reminder", id, data },
+    async (q) => {
+      await authorized(q, familyId, a, id, "edit");
+      const record = await bumpActiveRecord(q, familyId, id, data.version);
+      const fields = {
+        title: data.title,
+        category: data.category,
+        dueOn: data.dueOn,
+        recurrence: data.recurrence,
+        note: data.note,
+        anchorDay: Number(data.dueOn.slice(8, 10)),
+      };
+      let reminder: typeof s.reminders.$inferSelect;
+      if (data.reminderId) {
+        const [old] = await q
+          .select()
+          .from(s.reminders)
+          .where(
+            and(
+              eq(s.reminders.familyId, familyId),
+              eq(s.reminders.recordId, id),
+              eq(s.reminders.id, data.reminderId),
+            ),
+          );
+        if (!old) throw new AppError("NOT_FOUND", 404);
+        if (old.status !== "active") throw new AppError("REMINDER_CLOSED", 409);
+        // Editing title/notes alone preserves the original month-end anchor.
+        if (old.dueOn === data.dueOn && old.recurrence === data.recurrence)
+          fields.anchorDay = old.anchorDay;
+        [reminder] = await q
+          .update(s.reminders)
+          .set({ ...fields, updatedAt: new Date() })
+          .where(eq(s.reminders.id, old.id))
+          .returning();
+      } else {
+        [reminder] = await q
+          .insert(s.reminders)
+          .values({ familyId, recordId: id, ...fields, createdBy: a.id })
+          .returning();
+      }
+      await q
+        .insert(s.reminderEvents)
+        .values({
+          familyId,
+          recordId: id,
+          reminderId: reminder.id,
+          recordVersion: record.version,
+          action: data.reminderId ? "updated" : "created",
+          snapshot: reminderState(reminder),
+          createdBy: a.id,
+        });
+      await audit(
+        q,
+        familyId,
+        a,
+        data.reminderId ? "reminder.updated" : "reminder.created",
+        id,
+      );
+      return { id };
+    },
+  );
+}
+export async function changeReminder(
+  db: Db,
+  familyId: string,
+  a: Actor,
+  id: string,
+  input: unknown,
+  key: string,
+) {
+  const data = reminderActionInput.parse(input);
+  return mutate(
+    db,
+    familyId,
+    a,
+    key,
+    { action: "change-reminder", id, data },
+    async (q) => {
+      await authorized(q, familyId, a, id, "edit");
+      const record = await bumpActiveRecord(q, familyId, id, data.version);
+      const [reminder] = await q
+        .select()
+        .from(s.reminders)
+        .where(
+          and(
+            eq(s.reminders.familyId, familyId),
+            eq(s.reminders.recordId, id),
+            eq(s.reminders.id, data.reminderId),
+          ),
+        );
+      if (!reminder) throw new AppError("NOT_FOUND", 404);
+      if (
+        (data.action === "reopen" && reminder.status === "active") ||
+        (data.action !== "reopen" && reminder.status !== "active")
+      )
+        throw new AppError("REMINDER_CLOSED", 409);
+      let status = reminder.status,
+        dueOn = reminder.dueOn;
+      if (data.action === "complete") {
+        const next = nextDueDate(
+          dueOn,
+          reminder.recurrence as Recurrence,
+          reminder.anchorDay,
+        );
+        if (next) dueOn = next;
+        else status = "completed";
+      } else status = data.action === "cancel" ? "cancelled" : "active";
+      await q
+        .update(s.reminders)
+        .set({ status, dueOn, updatedAt: new Date() })
+        .where(eq(s.reminders.id, reminder.id));
+      // For actions, snapshot the occurrence being acted on (before advancing recurrence).
+      await q
+        .insert(s.reminderEvents)
+        .values({
+          familyId,
+          recordId: id,
+          reminderId: reminder.id,
+          recordVersion: record.version,
+          action: data.action,
+          snapshot: reminderState(reminder),
+          createdBy: a.id,
+        });
+      await audit(q, familyId, a, `reminder.${data.action}`, id);
+      return { id };
+    },
+  );
+}
+export async function reminderHistory(
+  db: Db,
+  familyId: string,
+  a: Actor,
+  id: string,
+  reminderId: string,
+) {
+  uuid.parse(reminderId);
+  return db.transaction(async (q) => {
+    await authorized(q, familyId, a, id, "view");
+    const [reminder] = await q
+      .select()
+      .from(s.reminders)
+      .where(
+        and(
+          eq(s.reminders.familyId, familyId),
+          eq(s.reminders.recordId, id),
+          eq(s.reminders.id, reminderId),
+        ),
+      );
+    if (!reminder) throw new AppError("NOT_FOUND", 404);
+    const events = await q
+      .select()
+      .from(s.reminderEvents)
+      .where(
+        and(
+          eq(s.reminderEvents.familyId, familyId),
+          eq(s.reminderEvents.recordId, id),
+          eq(s.reminderEvents.reminderId, reminderId),
+        ),
+      )
+      .orderBy(desc(s.reminderEvents.recordVersion))
+      .limit(101);
+    return { events: events.slice(0, 100), hasMore: events.length > 100 };
+  });
 }

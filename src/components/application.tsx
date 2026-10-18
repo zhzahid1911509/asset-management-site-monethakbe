@@ -23,6 +23,7 @@ import {
   ChevronRight,
   Globe,
   Archive,
+  Bell,
 } from "lucide-react";
 import { createAuthClient } from "better-auth/react";
 import type { snapshot } from "@/server/service";
@@ -32,6 +33,7 @@ import { Button } from "./button";
 import { Modal } from "./modal";
 import { AssetForm, type CatalogType } from "./asset-form";
 import { RecordDetail } from "./record-detail";
+import { Reminders } from "./reminders";
 import { FamilyMembers } from "./family-members";
 type Snapshot = Awaited<ReturnType<typeof snapshot>>;
 type Family = { id: string; name: string; role: string };
@@ -44,6 +46,7 @@ const language = {
     accounts: "Accounts & investments",
     liabilities: "Liabilities",
     family: "Family members",
+    reminders: "Reminders",
     settings: "Settings",
     add: "Add asset",
     workspace: "FAMILY WORKSPACE",
@@ -83,6 +86,7 @@ const language = {
     accounts: "হিসাব ও বিনিয়োগ",
     liabilities: "দায় ও ঋণ",
     family: "পরিবারের সদস্য",
+    reminders: "রিমাইন্ডার",
     settings: "সেটিংস",
     add: "সম্পদ যোগ করুন",
     workspace: "পরিবারের কর্মক্ষেত্র",
@@ -122,6 +126,7 @@ type Section =
   | "accounts"
   | "liabilities"
   | "family"
+  | "reminders"
   | "settings";
 export function Application({
   user,
@@ -234,6 +239,7 @@ export function Application({
     ["accounts", Landmark],
     ["liabilities", Archive],
     ["family", Users],
+    ["reminders", Bell],
   ] as const;
   const title =
     section === "overview"
@@ -419,7 +425,7 @@ export function Application({
                     : "Keep your family’s important details in order."}
               </p>
             </div>
-            {data?.canCreate && (
+            {data?.canCreate && section !== "reminders" && (
               <Button
                 onClick={() =>
                   setAdd(section === "liabilities" ? "liability" : "asset")
@@ -802,6 +808,16 @@ export function Application({
                     )}
                   </section>
                 )}
+                {section === "reminders" && (
+                  <Reminders
+                    key={familyId}
+                    familyId={familyId}
+                    records={data.records}
+                    locale={locale}
+                    onChanged={() => void refresh()}
+                    onOpenRecord={setDetail}
+                  />
+                )}
                 {section === "family" && (
                   <FamilyMembers
                     familyId={familyId}
@@ -898,13 +914,13 @@ export function Application({
                       </h2>
                       <p>
                         {bn
-                          ? "সম্পদ, মূল্যায়ন, প্রাথমিক দায়, পরিবার ও রেকর্ডের অনুমতি কার্যকর করা হয়েছে।"
-                          : "Assets, valuations, basic liabilities, family membership and record permissions are implemented."}
+                          ? "সম্পদ, মালিকানা, মূল্যায়ন, দায়-পরিশোধ ও সংশোধন, অ্যাপের রিমাইন্ডার এবং পরিবারের প্রবেশাধিকার কার্যকর করা হয়েছে।"
+                          : "Assets, co-owners, valuations, repayments and corrections, in-app reminders, family membership and record permissions are implemented."}
                       </p>
                       <p className="muted">
                         {bn
-                          ? "ডকুমেন্ট আপলোড, Google Drive, AI, স্মারক, ঋণ পরিশোধ, বহুমুদ্রা ও পূর্ণাঙ্গ ব্যাকআপ পরবর্তী পর্যায়ে।"
-                          : "Document uploads, Google Drive, AI, reminders, repayments, multiple currencies and full backup/restore remain for later phases."}
+                          ? "ডকুমেন্ট আপলোড, Google Drive, AI, ইমেইল/পুশ রিমাইন্ডার, বহুমুদ্রা ও পূর্ণাঙ্গ ব্যাকআপ পরবর্তী পর্যায়ে।"
+                          : "Document uploads, Google Drive, AI, email/push reminders, multiple currencies and full backup/restore remain for later phases."}
                       </p>
                     </section>
                   </div>

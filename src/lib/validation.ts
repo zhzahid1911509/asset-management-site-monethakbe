@@ -66,3 +66,10 @@ export const paymentInput = z.object({
   note: z.string().trim().max(1000).default(""),
   version: z.number().int().positive(),
 });
+
+export const reversalInput = z.strictObject({
+  version: z.number().int().positive(),
+  paymentId: uuid,
+  reversedOn: date,
+  reason: z.string().trim().min(3).max(500),
+});

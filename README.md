@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.3.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.4.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -14,11 +14,12 @@ A runnable **Next.js 16 / React / strict TypeScript** application for the first 
 - All 131 catalog types, with English and Bengali names; optional validated category-specific fields for all 14 categories.
 - Co-owner, beneficiary, manager and possessor records; separate legal/economic shares, dated family-share updates and revision history.
 - Asset creation, name/notes editing, append-only valuations, archive/restore, ownership-adjusted totals.
-- Liability repayments with separate principal, interest and fees, exact outstanding balances, append-only application payment entries and record-level financial history.
+- Liability repayments with separate principal, interest and fees, exact outstanding balances, append-only payment corrections and record-level financial history.
 - BDT exact-decimal calculations, missing-value states, permission-filtered dashboard and category counts.
 - Search/filtering, family switching, responsive layout, English/Bengali primary UI, Simple/Advanced preferences.
 - Authorized JSON current-record export including category details and current ownership; audit entries for mutations/exports.
 - Transactional idempotency for record creation, edits, valuation, repayments and archive/restore; optimistic record versions.
+- Record-linked in-app reminders with due/overdue views, recurrence, completion, cancellation, reopening and history.
 - Durable encrypted email queue and a Resend worker with bounded retries, job leases, fencing and idempotency keys.
 - Drizzle schema, generated SQL migration, versioned catalog seed, meaningful PostgreSQL-engine integration tests and authentication tests.
 
@@ -95,7 +96,7 @@ The test database is PGlite, running the tracked PostgreSQL schema against synth
 
 ## Known boundaries
 
-Read `docs/STATUS.md` before deployment. AI, document uploads, Drive, reminders, repayments, custom roles/categories/fields, full ownership histories, multi-currency, PDF/CSV reports, full backup/restore and production observability are not implemented yet. No controls pretend to provide these capabilities.
+Read `docs/STATUS.md` before deployment. AI, document uploads, Drive, email/push reminder delivery, custom roles/categories/fields, historical net-worth reports, multi-currency, PDF/CSV reports, full backup/restore and production observability are not implemented yet. No controls pretend to provide these capabilities.
 
 The UI translates the main workflows and catalog; auth-provider messages, role names and some validation/detail labels remain English. Full WCAG conformance and browser interaction testing remain outstanding. Simple/Advanced currently controls extra identifiers/version details; it is not yet the full advanced-workflow suite.
 
@@ -120,3 +121,7 @@ The public `/` route now shows the Bengali family-first home page. `/app` remain
 ## Upgrade to 0.3.0
 
 See [docs/UPGRADE-0.3.md](docs/UPGRADE-0.3.md). Apply the additive migration before starting the new app. It preserves current records and creates baseline detail/ownership history without inventing historical ownership dates.
+
+## Upgrade to 0.4.0
+
+See [docs/UPGRADE-0.4.md](docs/UPGRADE-0.4.md). Apply migration 0003 before starting the app. This release adds in-app reminders and full-payment reversals; email/push reminder delivery is not enabled.

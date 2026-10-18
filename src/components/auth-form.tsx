@@ -276,7 +276,7 @@ export function AuthForm() {
           <p className="fine-print">
             Foundation release · Asset records and family access.
             <br />
-            AI, document uploads and reminders are not available yet.
+            AI, document uploads and email reminders are not available yet.
           </p>
         </div>
       </section>

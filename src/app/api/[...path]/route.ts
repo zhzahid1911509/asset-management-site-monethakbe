@@ -28,6 +28,8 @@ async function handler(
         section = path[2],
         id = path[3],
         action = path[4];
+      if (section === "reminders" && path.length === 3 && method === "GET")
+        return service.listReminders(db, familyId, actor);
       if (section === "snapshot" && path.length === 3 && method === "GET")
         return service.snapshot(db, familyId, actor);
       if (section === "preferences" && path.length === 3 && method === "PUT")
@@ -56,6 +58,8 @@ async function handler(
             await body(request),
             key,
           );
+        if (path.length === 6 && action === "reminders" && method === "GET")
+          return service.reminderHistory(db, familyId, actor, id, path[5]);
         if (path.length === 5 && action === "metadata" && method === "GET")
           return service.recordMetadata(db, familyId, actor, id);
         if (path.length === 5 && action === "history" && method === "GET")
@@ -70,6 +74,33 @@ async function handler(
             key,
           );
         if (path.length === 5 && method === "POST") {
+          if (action === "reversals")
+            return service.reversePayment(
+              db,
+              familyId,
+              actor,
+              id,
+              await body(request),
+              key,
+            );
+          if (action === "reminders")
+            return service.saveReminder(
+              db,
+              familyId,
+              actor,
+              id,
+              await body(request),
+              key,
+            );
+          if (action === "reminder-actions")
+            return service.changeReminder(
+              db,
+              familyId,
+              actor,
+              id,
+              await body(request),
+              key,
+            );
           if (action === "details")
             return service.saveDetails(
               db,

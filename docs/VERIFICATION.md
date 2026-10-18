@@ -42,3 +42,12 @@ Browser interaction and screenshot checks were attempted but could not run: no b
 - Populated upgrade test: applies 0000/0001, inserts a legacy asset with a 12.345678% share and version 7, applies 0002, then checks unchanged values and an unknown effective ownership date.
 - Browser interaction, live Neon migrations and provider integrations were not exercised for this release. Existing browser runtime remains unavailable following the prior download failure.
 - Official implementation references: https://orm.drizzle.team/docs/column-types and https://orm.drizzle.team/docs/transactions and https://zod.dev/api .
+
+## Version 0.4.0 verification — 18 October 2026
+
+- Existing suite plus new reminder/reversal cases: 84 tests across 6 files (83 passed in the full run; the final migration-journal test is checked in the focused 19-test reminder/reversal run).
+- Cases include recurrence across month-end/leap-year/year boundaries; Asia/Dhaka dates; idempotency; exact principal restoration; interest-only corrections; older-payment reversal with later payments preserved; invalid dates; record/family/view/edit boundaries; archived-record restrictions; competing requests and audit rollback.
+- Populated upgrade preserves an existing payment and its liability balance. Migration-journal application and rerun check that all four migrations are tracked once. An initial generated ordering error was found and fixed before release: the composite payment key now precedes its referencing reversal foreign key.
+- Production build and strict TypeScript: passed.
+- No real reminders/emails were sent. No live Neon upgrade, interactive browser acceptance or external provider call is claimed. Browser runtime was unavailable in prior UI checks.
+- Primary references consulted: https://www.postgresql.org/docs/18/ddl-constraints.html and https://orm.drizzle.team/docs/transactions .

@@ -13,7 +13,7 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 | Area             | Current behavior                                                                              | Next implementation work                                                                                               |
 | ---------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Money            | BDT only, exact decimals, manual whole-asset valuation and included economic share            | FX snapshots, verified market sources, historical ownership, rounding policies by currency                             |
-| Liabilities      | Outstanding balance, principal/interest/fee payments, history; archive/restore                | Schedules, balance reconciliation and audited payment reversals                                                        |
+| Liabilities      | Outstanding balance, principal/interest/fee payments, full-payment reversals and history      | Amortization schedules, statement reconciliation and partial corrections                                               |
 | Ownership        | Co-owner roles, separate legal/economic shares, dated share revisions                         | Historical net-worth reports, party/member linking and ownership transfer workflows                                    |
 | Permissions      | Fixed role defaults, explicit per-record allow/deny; owner-only invitations/grants/revocation | Custom roles, admin delegation, time-limited grants, transfer/recovery workflows                                       |
 | Membership       | One-time verified-email invitation, expiry, revocation                                        | Re-invitation/reactivation of revoked members and role changes                                                         |
@@ -22,7 +22,7 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 | Catalog          | 131 seeded types, optional typed fields across all 14 categories                              | Editable family catalog, custom fields and guided multi-step forms                                                     |
 | AI               | Not implemented; no key-entry controls                                                        | KMS envelopes, adapters, budgets, failover and confirmation tools                                                      |
 | Documents/Drive  | Not implemented                                                                               | Private storage, scanning, metadata lifecycle, OAuth and reconciler                                                    |
-| Notifications    | Auth/invitation email queue only                                                              | Reminder categories, quiet hours and recurrence                                                                        |
+| Notifications    | Auth/invitation email queue; recurring in-app reminders and event history                     | Reminder delivery worker, email/push, quiet hours and notification preferences                                         |
 | Email encryption | AES-256-GCM with a server key and authenticated purpose                                       | Managed KMS envelope key rotation and retention procedures                                                             |
 | Security         | Server checks, CSRF/origin, auth throttling, constrained validation, opaque errors            | Production DB privilege separation, RLS defense in depth, fresh-auth sensitive actions, centralized operational limits |
 | UI               | Main labels/catalog bilingual, responsive CSS, native dialog keyboard behavior                | Full localization, browser E2E, measured WCAG 2.2 AA, dashboard customization and themes                               |
@@ -46,7 +46,7 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 
 ## Next deliverable
 
-Continue with payment corrections/reconciliation, document metadata/storage, reminders, broader localization and browser tests. Preserve current permission checks and the exact-money contract. Add AI only through the planned server-side secret boundary; never use browser-stored keys.
+Continue with document metadata/storage, reminder delivery/preferences, financial reconciliation, broader localization and browser tests. Preserve current permission checks and the exact-money contract. Add AI only through the planned server-side secret boundary; never use browser-stored keys.
 
 Version 0.1.1 starts the mail worker alongside Next.js with `npm run dev`. Production `npm start` still requires `npm run worker:email` separately. Permanent provider 4xx errors stop retries; HTTP 429 and 5xx can retry, respecting Retry-After. Worker logs classify errors without printing recipients, verification links or provider response bodies.
 
@@ -69,3 +69,14 @@ A responsive Bengali home page groups the supplied family, trust and technology 
 - Category and ownership updates are version-checked, idempotent and audited transactionally. Archived records show history but cannot receive these updates.
 - Current JSON export includes current details/owners; complete history exports are still pending. History screens display the latest 100 revisions per kind and disclose the limit.
 - Forms preserve drafts in memory on failures; automatic recovery after browser reload is still pending. Some enumerated option values remain English.
+
+## Version 0.4.0 corrections and in-app reminders
+
+- Full-payment reversal restores only original principal to the current balance. Original principal, interest and fee amounts remain in payment history and the entire entry is marked reversed. A separate correction records date, reason and before/after balances. Corrected payments can then be entered separately.
+- A payment can be reversed once, enforced by a unique constraint and a composite foreign key tying the reversal to the payment's family/record. Dates must be on/after the current balance date and no later than today. Later payments retain their original history. Partial reversals, bank reconciliation and lender-confirmed balances remain pending.
+- In-app reminders belong to an existing record, inherit its view/edit permission and appear in a workspace Reminders section. Categories cover maturity, renewal, payment, maintenance, valuation, family responsibility and other. They are manually created; category detail dates do not automatically create reminders.
+- Recurrence supports none/daily/weekly/monthly/quarterly/yearly. Completing a recurring occurrence advances exactly one period from its scheduled date, preserving its original day-of-month where possible. Missed occurrences are not silently skipped. Calendar dates are interpreted in Asia/Dhaka; no time-of-day delivery is claimed.
+- Reminders can be edited/rescheduled, completed, cancelled or reopened. Event history is retained. Archived records' reminders remain visible in All/history but are excluded from the active list and cannot be changed until the record is restored.
+- Reminder writes and reversals use the parent record version, idempotency keys, transactional audit and rollback. History reads are record-authorized. Reminder actions do not mark financial or legal obligations fulfilled outside this app and do not create a repayment.
+- Email, push, SMS, advance delivery, quiet hours, per-category preferences and assignee-specific notifications are not implemented. No reminder messages were sent during this implementation.
+- Reminder lists currently load all permitted reminders for a small family; history is capped at 100 entries with a limit notice. Cursor pagination and full history export remain pending. Current-record JSON export includes corrected balances but does not include reminder/reversal ledgers.

@@ -7,6 +7,10 @@ export class AppError extends Error {
   }
 }
 export const safeMessages: Record<string, string> = {
+  REVERSAL_DATE:
+    "Correction date must be on or after the current balance date and no later than today.",
+  ALREADY_REVERSED: "This payment has already been reversed.",
+  REMINDER_CLOSED: "This reminder changed status. Reload it before continuing.",
   OWNERSHIP_DATE:
     "Use a date on or after the latest ownership date and no later than today.",
   PAYMENT_DATE:

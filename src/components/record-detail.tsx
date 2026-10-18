@@ -310,6 +310,9 @@ export function RecordDetail({
         onSaved={onSaved}
       />
       <RecordHistory
+        canEdit={r.canEdit && !r.archived}
+        balanceAsOf={r.valuationDate}
+        onSaved={onSaved}
         familyId={familyId}
         recordId={r.id}
         version={r.version}
