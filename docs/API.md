@@ -56,3 +56,7 @@ All routes below use `/api/families/:familyId/records/:recordId`. Authentication
 | GET `/document-files/:versionId` | Export | Private attachment bytes; `?preview=1` allows PNG/JPEG inline only |
 
 Upload metadata: `{title, description, category, tags, version, documentId?}`. Omit documentId for a new document; include it for a replacement. PATCH metadata: `{title, description, category, tags, version, archived}`. Version refers to the parent record version. Successful publication/edit advances it. Available upload retries return the same IDs; active/failed retries return a safe conflict. Download responses are binary with no-store and request ID headers. Limits and recovery: DOCUMENTS.md.
+
+## Notification preferences (0.6.0)
+
+GET/PUT `/api/families/:familyId/notifications` reads/saves the authenticated member's personal settings. GET also returns the latest 100 personal delivery attempts, filtered by current record permissions. PUT uses an optimistic preference version (0 when absent); it does not accept another recipient or member ID. See NOTIFICATIONS.md for the JSON fields, schedule semantics and status meanings.

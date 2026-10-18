@@ -1,4 +1,8 @@
-export type MailKind = "verification" | "password-reset" | "invitation";
+export type MailKind =
+  | "verification"
+  | "password-reset"
+  | "invitation"
+  | "reminder";
 export const AUTH_LINK_SECONDS = 3600;
 const escape = (s: string) =>
   s.replace(
@@ -19,6 +23,16 @@ export function emailTemplate(kind: MailKind, url: string, recipient: string) {
   )
     throw new Error("EMAIL_URL_INVALID");
   const content = {
+    reminder: {
+      subject: "A family reminder needs your attention",
+      title: "A reminder for your family",
+      body: "A scheduled family reminder is ready for you to review. Sign in to Mone Thakbe to see the details in your Reminders section. For your privacy, this email does not include record names, amounts or document details.",
+      button: "Review reminders",
+      expiry:
+        "This is a reminder, not confirmation that a payment or obligation has been completed. Check the current status in your workspace.",
+      safety:
+        "You receive these emails because you enabled reminder emails for a family workspace. To change the schedule or turn them off, open Settings → Email reminders in that workspace.",
+    },
     verification: {
       subject: "Verify your email address",
       title: "Welcome to Mone Thakbe",

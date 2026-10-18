@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { unseal } from "./secrets";
 const payload = z.object({
+  kind: z.literal("reminder").optional(),
   to: z.string().email(),
   subject: z.string().min(1),
   text: z.string().min(1),
@@ -64,7 +65,7 @@ export async function deliverEmail(
   job: { id: string; payload: string },
   transport: typeof fetch = fetch,
 ) {
-  const data = decodeEmail(job.payload);
+  const { kind: _kind, ...data } = decodeEmail(job.payload);
   let response: Response;
   try {
     response = await transport("https://api.resend.com/emails", {

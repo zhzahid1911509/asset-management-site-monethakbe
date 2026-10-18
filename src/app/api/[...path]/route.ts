@@ -1,3 +1,4 @@
+import * as notifications from "@/server/notifications";
 import * as documents from "@/server/documents";
 import { documentForm } from "@/server/document-files";
 import { getDb } from "@/db";
@@ -30,6 +31,17 @@ async function handler(
         section = path[2],
         id = path[3],
         action = path[4];
+      if (section === "notifications" && path.length === 3) {
+        if (method === "GET")
+          return notifications.notificationSettings(db, familyId, actor);
+        if (method === "PUT")
+          return notifications.saveNotificationSettings(
+            db,
+            familyId,
+            actor,
+            await body(request),
+          );
+      }
       if (section === "reminders" && path.length === 3 && method === "GET")
         return service.listReminders(db, familyId, actor);
       if (section === "snapshot" && path.length === 3 && method === "GET")

@@ -22,7 +22,7 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 | Catalog          | 131 seeded types, optional typed fields across all 14 categories                              | Editable family catalog, custom fields and guided multi-step forms                                                     |
 | AI               | Not implemented; no key-entry controls                                                        | KMS envelopes, adapters, budgets, failover and confirmation tools                                                      |
 | Documents/Drive | Private S3 uploads, ClamAV gate, versions, metadata/search/history, archive/restore, checked downloads and failed-upload cleanup | Drive OAuth, richer formats, content search, retention administration and full reconciliation |
-| Notifications    | Auth/invitation email queue; recurring in-app reminders and event history                     | Reminder delivery worker, email/push, quiet hours and notification preferences                                         |
+| Notifications | In-app reminders; opt-in personal email scheduling, category/advance/time-zone/quiet-hour controls and delivery history | Push/SMS, snooze, per-record/per-category schedules, specialized events and bounce webhooks |
 | Email encryption | AES-256-GCM with a server key and authenticated purpose                                       | Managed KMS envelope key rotation and retention procedures                                                             |
 | Security         | Server checks, CSRF/origin, auth throttling, constrained validation, opaque errors            | Production DB privilege separation, RLS defense in depth, fresh-auth sensitive actions, centralized operational limits |
 | UI               | Main labels/catalog bilingual, responsive CSS, native dialog keyboard behavior                | Full localization, browser E2E, measured WCAG 2.2 AA, dashboard customization and themes                               |
@@ -46,7 +46,7 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 
 ## Next deliverable
 
-Continue with reminder delivery/preferences, financial reconciliation, broader localization and browser tests. Preserve current permission checks and the exact-money contract. Add AI only through the planned server-side secret boundary; never use browser-stored keys.
+Continue with reporting/export and financial reconciliation, broader localization and browser tests. Preserve current permission checks and the exact-money contract. Add AI only through the planned server-side secret boundary; never use browser-stored keys.
 
 Version 0.1.1 starts the mail worker alongside Next.js with `npm run dev`. Production `npm start` still requires `npm run worker:email` separately. Permanent provider 4xx errors stop retries; HTTP 429 and 5xx can retry, respecting Retry-After. Worker logs classify errors without printing recipients, verification links or provider response bodies.
 
@@ -95,3 +95,9 @@ A responsive Bengali home page groups the supplied family, trust and technology 
 - Shared professional HTML/plain-text templates for all implemented service email: verification/resend, password reset and invitations. Existing encrypted text-only queued jobs remain supported. No reminder delivery added.
 - Web-app manifest, Android install-prompt handling, iOS/iPadOS Safari instructions and a network-only service worker with generic offline fallback. No private offline cache, native store binaries, push notifications or background sync.
 - Real-device installation and email-client rendering still require deployment verification; see INSTALLATION.md.
+
+## Version 0.6.0 reminder delivery
+
+Personal email preferences are now opt-in per member/family. The existing worker schedules active authorized reminders, tracks occurrence/interval identities, and rechecks permission/status/preferences immediately before dispatch. Quiet hours, recipient time zones, advance notice and safe delivery-history status are implemented. Messages are deliberately generic; account/invitation mail remains independent.
+
+This supersedes the earlier release notes that described email reminders as unavailable. The full notification specification is not complete: specialized categories, snooze, per-record overrides, push/SMS and delivery webhooks remain pending. See NOTIFICATIONS.md and UPGRADE-0.6.md.

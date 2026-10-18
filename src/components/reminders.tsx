@@ -246,8 +246,8 @@ export function Reminders({
           </h2>
           <p className="muted">
             {bn
-              ? "অ্যাপে দেখা যায় · তারিখ বাংলাদেশের সময় অনুযায়ী · ইমেইল বা পুশ পাঠানো হয় না।"
-              : "In-app reminders · Dates use Bangladesh time · Email and push delivery are not enabled."}
+              ? "অ্যাপের তারিখ বাংলাদেশের সময় অনুযায়ী। ইমেইল রিমাইন্ডার সেটিংস থেকে চালু করুন।"
+              : "In-app dates use Bangladesh time. Enable personal email reminders in Settings; push delivery is not enabled."}
           </p>
         </div>
         <Button variant="secondary" disabled={busy} onClick={onChanged}>

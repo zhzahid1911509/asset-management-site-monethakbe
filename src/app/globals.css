@@ -2072,3 +2072,8 @@ thead {
 body:has(.app-layout) > .install-panel { margin-left: 244px; }
 @media (max-width:1150px) { body:has(.app-layout) > .install-panel { margin-left: 220px; } }
 @media (max-width:850px) { body:has(.app-layout) > .install-panel { margin-left: 0; } }
+.notification-settings fieldset { border: 0; padding: 0; margin: 18px 0; min-width: 0; }
+.notification-settings legend { font-weight: 600; margin-bottom: 10px; }
+.notification-checks { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 8px; }
+.notification-history { list-style: none; padding: 0; }
+.notification-history li { border-top: 1px solid var(--line); padding: 15px 0; overflow-wrap: anywhere; }

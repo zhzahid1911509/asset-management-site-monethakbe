@@ -271,8 +271,7 @@ export function AuthForm() {
           <p className="fine-print">
             Foundation release · Asset records and family access.
             <br />
-            Document uploads require storage/scanner setup. AI and email
-            reminders are not available yet.
+            Document uploads require storage/scanner setup. Email reminders are opt-in from Settings. AI is not available yet.
           </p>
         </div>
       </section>

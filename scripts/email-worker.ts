@@ -1,3 +1,11 @@
+import { drizzle } from "drizzle-orm/node-postgres";
+import * as schema from "../src/db/schema";
+import {
+  applyReminderGate,
+  scheduleReminderEmails,
+  reminderDeliveryGate,
+} from "../src/server/notifications";
+import { decodeEmail } from "../src/server/email-delivery";
 import "./load-env";
 import { Pool } from "pg";
 import { randomUUID } from "node:crypto";
@@ -12,6 +20,7 @@ const required = [
   "RESEND_API_KEY",
   "EMAIL_FROM",
   "APP_ENCRYPTION_KEY",
+  "APP_ORIGIN",
 ];
 const missing = required.filter((name) => !process.env[name]);
 if (
@@ -35,6 +44,9 @@ const pool = new Pool({
   connectionTimeoutMillis: 10000,
   statement_timeout: 15000,
 });
+const db = drizzle(pool, { schema });
+let schedulerCursor: string | undefined;
+let nextSchedule = 0;
 let stopping = false;
 process.on("SIGTERM", () => (stopping = true));
 process.on("SIGINT", () => (stopping = true));
@@ -47,6 +59,22 @@ async function run() {
     }),
   );
   do {
+    if (Date.now() >= nextSchedule) {
+      const scheduled = await scheduleReminderEmails(
+        db,
+        new Date(),
+        schedulerCursor,
+      );
+      schedulerCursor = scheduled.nextCursor;
+      nextSchedule = Date.now() + 15000;
+      if (scheduled.queued)
+        console.log(
+          JSON.stringify({
+            event: "reminders.queued",
+            count: scheduled.queued,
+          }),
+        );
+    }
     // Expire old messages before claiming them, including abandoned old leases.
     await pool.query(
       "UPDATE email_jobs SET status='expired',payload='',lease_token=null,lease_until=null WHERE (status IN ('pending','failed') OR status='processing' AND lease_until<now()) AND created_at<now()-interval '12 hours'",
@@ -62,19 +90,37 @@ async function run() {
     const job = claimed.rows[0];
     if (job) {
       try {
-        await deliverEmail(job);
-        const updated = await pool.query(
-          "UPDATE email_jobs SET status='sent',payload='',last_error=null,lease_token=null,lease_until=null WHERE id=$1 AND lease_token=$2",
-          [job.id, lease],
+        const decoded = decodeEmail(job.payload);
+        const gate = await reminderDeliveryGate(
+          db,
+          job.id,
+          decoded.to,
+          new Date(),
+          decoded.kind === "reminder",
         );
-        console.log(
-          JSON.stringify({
-            event: updated.rowCount
-              ? "email.provider_accepted"
-              : "email.lease_lost",
-            id: job.id,
-          }),
-        );
+        if (gate.action !== "send") {
+          await applyReminderGate(db, job.id, lease, gate);
+        } else {
+          const renewed = await pool.query(
+            "UPDATE email_jobs SET lease_until=now()+interval '60 seconds' WHERE id=$1 AND lease_token=$2 AND status='processing' AND lease_until>now()",
+            [job.id, lease],
+          );
+          if (!renewed.rowCount)
+            throw new DeliveryError("EMAIL_LEASE_LOST", true);
+          await deliverEmail(job);
+          const updated = await pool.query(
+            "UPDATE email_jobs SET status='sent',payload='',last_error=null,lease_token=null,lease_until=null WHERE id=$1 AND lease_token=$2",
+            [job.id, lease],
+          );
+          console.log(
+            JSON.stringify({
+              event: updated.rowCount
+                ? "email.provider_accepted"
+                : "email.lease_lost",
+              id: job.id,
+            }),
+          );
+        }
       } catch (error) {
         const failure =
           error instanceof DeliveryError

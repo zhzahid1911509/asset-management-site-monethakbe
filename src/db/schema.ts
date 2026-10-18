@@ -649,3 +649,65 @@ export const documentEvents = pgTable(
     }),
   ],
 );
+
+export const notificationPreferences = pgTable(
+  "notification_preferences",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    userId: text("user_id").notNull(),
+    enabled: boolean("enabled").default(false).notNull(),
+    categories: jsonb("categories").$type<string[]>().notNull(),
+    advanceDays: jsonb("advance_days").$type<number[]>().notNull(),
+    timeZone: text("time_zone").notNull(),
+    sendAt: text("send_at").notNull(),
+    quietEnabled: boolean("quiet_enabled").notNull(),
+    quietStart: text("quiet_start").notNull(),
+    quietEnd: text("quiet_end").notNull(),
+    version: integer("version").default(1).notNull(),
+    updatedAt: time("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    unique("notification_preference_user_uq").on(t.familyId, t.userId),
+    foreignKey({
+      columns: [t.familyId, t.userId],
+      foreignColumns: [memberships.familyId, memberships.userId],
+    }),
+    check("notification_preference_version_ck", sql`${t.version}>0`),
+  ],
+);
+export const notificationDeliveries = pgTable(
+  "notification_deliveries",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    recordId: uuid("record_id").notNull(),
+    reminderId: uuid("reminder_id").notNull(),
+    userId: text("user_id").notNull(),
+    dueOn: date("due_on").notNull(),
+    advanceDays: integer("advance_days").notNull(),
+    scheduledOn: date("scheduled_on").notNull(),
+    jobId: uuid("job_id")
+      .unique()
+      .references(() => emailJobs.id),
+    createdAt: time("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    unique("notification_occurrence_uq").on(
+      t.familyId,
+      t.userId,
+      t.reminderId,
+      t.dueOn,
+      t.advanceDays,
+    ),
+    foreignKey({
+      columns: [t.familyId, t.recordId, t.reminderId],
+      foreignColumns: [reminders.familyId, reminders.recordId, reminders.id],
+    }),
+    foreignKey({
+      columns: [t.familyId, t.userId],
+      foreignColumns: [memberships.familyId, memberships.userId],
+    }),
+    check("notification_advance_ck", sql`${t.advanceDays} between 0 and 30`),
+  ],
+);

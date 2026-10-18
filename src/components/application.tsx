@@ -1,4 +1,5 @@
 "use client";
+import { NotificationSettings } from "./notification-settings";
 import { Brand } from "@/components/brand";
 
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -151,6 +152,10 @@ export function Application({
     [detail, setDetail] = useState<string | null>(null),
     [newFamily, setNewFamily] = useState(false),
     [busy, setBusy] = useState(false);
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("view") === "reminders") setSection("reminders");
+  }, []);
   const sequence = useRef(0);
   const t = language[locale],
     bn = locale === "bn";
@@ -177,7 +182,14 @@ export function Application({
         if (!active) return;
         setFamilies(f);
         setCatalog(c);
-        setFamilyId(f[0]?.id ?? "");
+        setFamilyId(
+          f.some(
+            (item) =>
+              item.id === new URLSearchParams(location.search).get("family"),
+          )
+            ? new URLSearchParams(location.search).get("family")!
+            : (f[0]?.id ?? ""),
+        );
         if (!f.length) setLoading(false);
       })
       .catch((e) => {
@@ -903,6 +915,11 @@ export function Application({
                         {t.export}
                       </Button>
                     </section>
+                    <NotificationSettings
+                      key={familyId}
+                      familyId={familyId}
+                      locale={locale}
+                    />
                     <section className="panel settings-panel span-two">
                       <h2>
                         {bn ? "এই সংস্করণে যা আছে" : "Foundation release"}
@@ -914,8 +931,8 @@ export function Application({
                       </p>
                       <p className="muted">
                         {bn
-                          ? "Google Drive, AI, ইমেইল/পুশ রিমাইন্ডার, বহুমুদ্রা ও পূর্ণাঙ্গ ব্যাকআপ পরবর্তী পর্যায়ে।"
-                          : "Google Drive, AI, email/push reminders, multiple currencies and full backup/restore remain for later phases."}
+                          ? "Google Drive, AI, পুশ রিমাইন্ডার, বহুমুদ্রা ও পূর্ণাঙ্গ ব্যাকআপ পরবর্তী পর্যায়ে।"
+                          : "Google Drive, AI, push reminders, multiple currencies and full backup/restore remain for later phases."}
                       </p>
                     </section>
                   </div>
@@ -930,7 +947,7 @@ export function Application({
                 ? "যত্নে রাখুন, মনে রাখুন।"
                 : "A little care for everything that matters."}
             </span>
-            <span>Version 0.5.1</span>
+            <span>Version 0.6.0</span>
           </footer>
         </main>
       </div>

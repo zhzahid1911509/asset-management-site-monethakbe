@@ -38,7 +38,7 @@ const today = () =>
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
-async function member(q: Query, familyId: string, a: Actor) {
+export async function member(q: Query, familyId: string, a: Actor) {
   uuid.parse(familyId);
   const [m] = await q
     .select()

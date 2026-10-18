@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.5.1 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.6.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -98,7 +98,7 @@ The test database is PGlite, running the tracked PostgreSQL schema against synth
 
 ## Known boundaries
 
-Read `docs/STATUS.md` before deployment. AI, Drive, email/push reminder delivery, custom roles/categories/fields, historical net-worth reports, multi-currency, PDF/CSV reports, full backup/restore and production observability are not implemented yet. No controls pretend to provide these capabilities.
+Read `docs/STATUS.md` before deployment. AI, Drive, push reminder delivery, custom roles/categories/fields, historical net-worth reports, multi-currency, PDF/CSV reports, full backup/restore and production observability are not implemented yet. No controls pretend to provide these capabilities.
 
 The UI translates the main workflows and catalog; auth-provider messages, role names and some validation/detail labels remain English. Full WCAG conformance and browser interaction testing remain outstanding. Simple/Advanced currently controls extra identifiers/version details; it is not yet the full advanced-workflow suite.
 
@@ -139,3 +139,9 @@ The supplied logo appears across public/auth/workspace/setup pages and browser/h
 Android and iPhone/iPad installation help is available at the bottom of every page. Supported browsers can show the native install prompt; Safari users can add the app through Share → Add to Home Screen. This is an installable web app, with online access required for records; it does not include native store packages or push notifications. See [docs/INSTALLATION.md](docs/INSTALLATION.md).
 
 Keep your environment files and secrets, run `npm ci`, then restart both web and email-worker processes. For production, run `npm run build` before restarting. No new database migration is added in 0.5.1; users upgrading from older releases must still apply existing migrations. Old queued emails keep their original content.
+
+## Upgrade to 0.6.0
+
+Apply migration 0005, then restart the web app and email worker. Open Settings → Email reminders to opt in separately for each family. Choose reminder categories, advance notice, preferred time, time zone and quiet hours. Personal delivery history shows queue/provider status. The same worker now schedules and delivers reminders; no additional daemon is required.
+
+See [docs/UPGRADE-0.6.md](docs/UPGRADE-0.6.md) and [docs/NOTIFICATIONS.md](docs/NOTIFICATIONS.md). The worker requires APP_ORIGIN as well as its existing settings. Reminder emails contain generic sign-in links rather than private record details. No member is subscribed by the migration.

@@ -73,3 +73,13 @@ Not executed: live Neon migration/pooling/concurrency, live S3 requests/IAM/encr
 - The invitation integration test's URL extraction was updated to stop at any whitespace, so it correctly parses the multiline professional email body. Invitation acceptance, recipient binding and one-time use still pass.
 - The supplied logo was inspected and copied unchanged; PNG installation icons were mechanically resized/padded from it.
 - A local HTTP smoke test could not run because Next's server startup encountered the environment's `uv_interface_addresses` system error. No successful browser/device interaction, actual installation, live delivery or inbox rendering is claimed. No real email was sent.
+
+## Version 0.6.0 — opt-in reminder emails
+
+Executed with synthetic data and mocked mail transport only:
+
+- Strict TypeScript check passed.
+- **134 tests passed across 11 files**, including 24 new notification tests: default opt-out, member/family isolation, preference versions/validation, scheduled local time, time zones/DST clock behavior, quiet hours, advance intervals, deduplication, category and View filters, archived records, revoked/expired memberships, recipient verification, completion/rescheduling/reopening, recurrence, private-content omission, queue rollback, scheduler pagination, provider payload boundaries, and fenced cancellation/deferral with content cleanup.
+- All six tracked migrations were exercised by the PostgreSQL-engine tests; the migration-journal rerun remained idempotent. Existing authentication, invitation, document, ownership, finance, reminder and installation tests passed.
+- Production Next.js build passed.
+- No real emails were sent. No live Neon migration, multiple-worker network/concurrency test, real Resend delivery, browser form interaction or notification inbox placement was verified. These are deployment checks in NOTIFICATIONS.md.
