@@ -558,3 +558,94 @@ export const reminderEvents = pgTable(
     ),
   ],
 );
+
+export const documents = pgTable(
+  "documents",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    recordId: uuid("record_id").notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    category: text("category").notNull(),
+    tags: jsonb("tags").$type<string[]>().notNull(),
+    archived: boolean("archived").default(false).notNull(),
+    currentRevision: integer("current_revision").default(0).notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: time("created_at").defaultNow().notNull(),
+    updatedAt: time("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    unique("document_scope_uq").on(t.familyId, t.recordId, t.id),
+    foreignKey({
+      columns: [t.familyId, t.recordId],
+      foreignColumns: [records.familyId, records.id],
+    }),
+    check("document_revision_ck", sql`${t.currentRevision} >= 0`),
+  ],
+);
+export const documentVersions = pgTable(
+  "document_versions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    recordId: uuid("record_id").notNull(),
+    documentId: uuid("document_id").notNull(),
+    revision: integer("revision").notNull(),
+    filename: text("filename").notNull(),
+    mime: text("mime").notNull(),
+    size: integer("size").notNull(),
+    sha256: text("sha256").notNull(),
+    status: text("status").default("pending").notNull(),
+    errorCode: text("error_code"),
+    requestKey: uuid("request_key").notNull(),
+    inputHash: text("input_hash").notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: time("created_at").defaultNow().notNull(),
+    updatedAt: time("updated_at").defaultNow().notNull(),
+    scannedAt: time("scanned_at"),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.familyId, t.recordId, t.documentId],
+      foreignColumns: [documents.familyId, documents.recordId, documents.id],
+    }),
+    unique("document_revision_uq").on(t.documentId, t.revision),
+    unique("document_request_uq").on(t.familyId, t.createdBy, t.requestKey),
+    index("document_status_idx").on(t.status, t.updatedAt),
+    check("document_size_ck", sql`${t.size} > 0 and ${t.size} <= 10485760`),
+    check(
+      "document_status_ck",
+      sql`${t.status} in ('pending','scanning','available','rejected','failed','discarded')`,
+    ),
+    check(
+      "document_clean_ck",
+      sql`${t.status} <> 'available' or ${t.scannedAt} is not null`,
+    ),
+  ],
+);
+export const documentEvents = pgTable(
+  "document_events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    familyId: uuid("family_id").notNull(),
+    recordId: uuid("record_id").notNull(),
+    documentId: uuid("document_id").notNull(),
+    action: text("action").notNull(),
+    snapshot: jsonb("snapshot").$type<Record<string, unknown>>().notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id),
+    createdAt: time("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.familyId, t.recordId, t.documentId],
+      foreignColumns: [documents.familyId, documents.recordId, documents.id],
+    }),
+  ],
+);

@@ -1,6 +1,6 @@
 {
   "name": "monethakbe",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "scripts": {
     "dev": "node scripts/dev.mjs",
@@ -13,9 +13,11 @@
     "db:seed": "tsx scripts/seed.ts",
     "worker:email": "tsx scripts/email-worker.ts",
     "dev:web": "next dev",
-    "email:status": "tsx scripts/email-status.ts"
+    "email:status": "tsx scripts/email-status.ts",
+    "documents:cleanup": "tsx scripts/document-cleanup.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.1152.0",
     "@better-auth/drizzle-adapter": "1.7.10",
     "@hookform/resolvers": "5.9.1",
     "@next/env": "16.4.2",
@@ -26,6 +28,7 @@
     "decimal.js": "10.6.0",
     "dotenv": "18.0.8",
     "drizzle-orm": "0.45.4",
+    "file-type": "22.2.0",
     "lucide-react": "1.59.0",
     "next": "16.4.2",
     "pg": "8.23.1",

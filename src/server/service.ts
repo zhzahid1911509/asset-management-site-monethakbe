@@ -49,7 +49,7 @@ async function member(q: Query, familyId: string, a: Actor) {
   if (!m || !isActive(m)) throw new AppError("NOT_FOUND", 404);
   return m;
 }
-async function authorized(
+export async function authorized(
   q: Query,
   familyId: string,
   a: Actor,
@@ -75,7 +75,7 @@ async function authorized(
   if (!can(m, r, action, grants)) throw new AppError("NOT_FOUND", 404);
   return { m, r };
 }
-const audit = (
+export const audit = (
   q: Query,
   familyId: string,
   a: Actor,
@@ -83,7 +83,7 @@ const audit = (
   recordId?: string,
 ) =>
   q.insert(s.auditLogs).values({ familyId, actorId: a.id, action, recordId });
-async function mutate(
+export async function mutate(
   db: Db,
   familyId: string,
   a: Actor,
@@ -986,7 +986,7 @@ export async function saveOwnership(
   );
 }
 
-async function bumpActiveRecord(
+export async function bumpActiveRecord(
   q: Tx,
   familyId: string,
   id: string,

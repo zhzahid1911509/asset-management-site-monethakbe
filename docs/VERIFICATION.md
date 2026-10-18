@@ -51,3 +51,16 @@ Browser interaction and screenshot checks were attempted but could not run: no b
 - Production build and strict TypeScript: passed.
 - No real reminders/emails were sent. No live Neon upgrade, interactive browser acceptance or external provider call is claimed. Browser runtime was unavailable in prior UI checks.
 - Primary references consulted: https://www.postgresql.org/docs/18/ddl-constraints.html and https://orm.drizzle.team/docs/transactions .
+
+## Version 0.5.0 — private document management
+
+Executed in the implementation workspace using synthetic data:
+
+- `npm run typecheck`: passed (strict TypeScript, including new document modules/tests).
+- `npm test`: **105 tests passed across 8 files**. The new coverage includes exact upload/download bytes, replacement history, replay idempotency, active duplicate rejection, cross-record/family denial, View versus Export permission, revocation during external I/O, malware/scanner failure, uncertain storage writes, optimistic conflicts, archive/restore, quota reservation, cleanup eligibility/failure, content-integrity failure, multipart bounds, file validation and binary HTTP responses/origin checks.
+- The ClamAV adapter was exercised against a local synthetic TCP server that verifies INSTREAM bytes and returns clean/infected/error verdicts. It was not a real malware engine and no real malware was uploaded.
+- Database tests executed tracked SQL in PGlite, including all five migrations and a safe migration-journal rerun. Existing auth, money, ownership, reminder and repayment tests continued to pass.
+- `npm run build`: passed; public and authenticated route compilation completed without service credentials.
+- Source ZIP validation: performed during packaging; generated output, dependencies and populated environment files excluded.
+
+Not executed: live Neon migration/pooling/concurrency, live S3 requests/IAM/encryption, actual ClamAV signatures/detection, browser upload/preview interactions, deployment load/edge limits or a backup restoration drill. These remain explicit deployment checks in DOCUMENTS.md. No real email was sent.

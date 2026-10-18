@@ -919,8 +919,8 @@ export function Application({
                       </p>
                       <p className="muted">
                         {bn
-                          ? "ডকুমেন্ট আপলোড, Google Drive, AI, ইমেইল/পুশ রিমাইন্ডার, বহুমুদ্রা ও পূর্ণাঙ্গ ব্যাকআপ পরবর্তী পর্যায়ে।"
-                          : "Document uploads, Google Drive, AI, email/push reminders, multiple currencies and full backup/restore remain for later phases."}
+                          ? "Google Drive, AI, ইমেইল/পুশ রিমাইন্ডার, বহুমুদ্রা ও পূর্ণাঙ্গ ব্যাকআপ পরবর্তী পর্যায়ে।"
+                          : "Google Drive, AI, email/push reminders, multiple currencies and full backup/restore remain for later phases."}
                       </p>
                     </section>
                   </div>

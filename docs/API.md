@@ -42,3 +42,17 @@ Amounts and percentages are decimal strings. Record input:
 Omit amount for an unknown asset valuation. Liability amounts are required and represent the family's included outstanding balance. No foreign currency conversion is performed.
 
 Errors return `{error:{code,message,correlationId,retryable,fields}}`. Hidden records/workspaces return not-found. A conflict preserves the original committed record and requires reload/compare. Runtime error logs contain only event/code/correlation ID; raw database/provider errors and request bodies are not logged by the application boundary.
+
+## Documents (0.5.0)
+
+All routes below use `/api/families/:familyId/records/:recordId`. Authentication and active membership are required. Mutations require the exact APP_ORIGIN Origin header.
+
+| Method / suffix | Permission | Behavior |
+| --- | --- | --- |
+| GET `/documents` | View | Metadata list and setup-presence flag |
+| POST `/documents` | Edit | Multipart `file` and JSON-string `metadata`; UUID Idempotency-Key required |
+| GET `/documents/:documentId` | View | Latest 100 versions and events |
+| PATCH `/documents/:documentId` | Edit | JSON metadata/archive state; version and Idempotency-Key required |
+| GET `/document-files/:versionId` | Export | Private attachment bytes; `?preview=1` allows PNG/JPEG inline only |
+
+Upload metadata: `{title, description, category, tags, version, documentId?}`. Omit documentId for a new document; include it for a replacement. PATCH metadata: `{title, description, category, tags, version, archived}`. Version refers to the parent record version. Successful publication/edit advances it. Available upload retries return the same IDs; active/failed retries return a safe conflict. Download responses are binary with no-store and request ID headers. Limits and recovery: DOCUMENTS.md.

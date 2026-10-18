@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import type { snapshot } from "@/server/service";
 import { api, errorText } from "@/lib/client";
 import { formatMoney } from "@/lib/money";
+import { RecordDocuments } from "./record-documents";
 import { RecordMetadata } from "./record-metadata";
 import { RecordHistory } from "./record-history";
 import { Button } from "./button";
@@ -302,6 +303,13 @@ export function RecordDetail({
               : "You have read-only access to this record.")}
         </p>
       )}
+      <RecordDocuments
+        key={`docs:${r.id}:${r.version}`}
+        record={r}
+        familyId={familyId}
+        locale={locale}
+        onSaved={onSaved}
+      />
       <RecordMetadata
         key={`${r.id}:${r.version}`}
         record={r}

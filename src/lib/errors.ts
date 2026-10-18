@@ -7,6 +7,21 @@ export class AppError extends Error {
   }
 }
 export const safeMessages: Record<string, string> = {
+  DOCUMENTS_NOT_CONFIGURED:
+    "Document storage and scanning need administrator setup.",
+  INVALID_FILE:
+    "Use a matching PDF, PNG, JPEG, UTF-8 TXT or CSV file, up to 10 MB.",
+  UNSAFE_FILE: "The scanner rejected this file. It was not made available.",
+  SCAN_UNAVAILABLE:
+    "The malware scanner is unavailable. Upload was blocked; please try again later.",
+  DOCUMENT_UNAVAILABLE:
+    "The document service could not complete the request. Reload before retrying.",
+  UPLOAD_BUSY: "This upload is still pending. Reload to check its status.",
+  UPLOAD_FAILED:
+    "This upload did not finish. Reload and start a new upload attempt.",
+  DOCUMENT_QUOTA:
+    "The family's 1 GB document allowance is full, including retained versions and unfinished uploads.",
+  DOCUMENT_LIMIT: "A record can contain up to 100 documents.",
   REVERSAL_DATE:
     "Correction date must be on or after the current balance date and no later than today.",
   ALREADY_REVERSED: "This payment has already been reversed.",

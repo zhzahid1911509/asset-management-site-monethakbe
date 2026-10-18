@@ -43,6 +43,11 @@ export async function handle(
         throw new AppError("FORBIDDEN", 403);
     }
     const data = await run(await actor(request));
+    if (data instanceof Response) {
+      data.headers.set("Cache-Control", "no-store");
+      data.headers.set("X-Request-ID", correlationId);
+      return data;
+    }
     return Response.json(data, {
       headers: { "Cache-Control": "no-store", "X-Request-ID": correlationId },
     });

@@ -21,7 +21,7 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 | Export           | Current visible/exportable record JSON including details and owners                           | Full history archive, CSV/PDF, asynchronous jobs and restoration                                                       |
 | Catalog          | 131 seeded types, optional typed fields across all 14 categories                              | Editable family catalog, custom fields and guided multi-step forms                                                     |
 | AI               | Not implemented; no key-entry controls                                                        | KMS envelopes, adapters, budgets, failover and confirmation tools                                                      |
-| Documents/Drive  | Not implemented                                                                               | Private storage, scanning, metadata lifecycle, OAuth and reconciler                                                    |
+| Documents/Drive | Private S3 uploads, ClamAV gate, versions, metadata/search/history, archive/restore, checked downloads and failed-upload cleanup | Drive OAuth, richer formats, content search, retention administration and full reconciliation |
 | Notifications    | Auth/invitation email queue; recurring in-app reminders and event history                     | Reminder delivery worker, email/push, quiet hours and notification preferences                                         |
 | Email encryption | AES-256-GCM with a server key and authenticated purpose                                       | Managed KMS envelope key rotation and retention procedures                                                             |
 | Security         | Server checks, CSRF/origin, auth throttling, constrained validation, opaque errors            | Production DB privilege separation, RLS defense in depth, fresh-auth sensitive actions, centralized operational limits |
@@ -46,7 +46,7 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 
 ## Next deliverable
 
-Continue with document metadata/storage, reminder delivery/preferences, financial reconciliation, broader localization and browser tests. Preserve current permission checks and the exact-money contract. Add AI only through the planned server-side secret boundary; never use browser-stored keys.
+Continue with reminder delivery/preferences, financial reconciliation, broader localization and browser tests. Preserve current permission checks and the exact-money contract. Add AI only through the planned server-side secret boundary; never use browser-stored keys.
 
 Version 0.1.1 starts the mail worker alongside Next.js with `npm run dev`. Production `npm start` still requires `npm run worker:email` separately. Permanent provider 4xx errors stop retries; HTTP 429 and 5xx can retry, respecting Retry-After. Worker logs classify errors without printing recipients, verification links or provider response bodies.
 
@@ -80,3 +80,11 @@ A responsive Bengali home page groups the supplied family, trust and technology 
 - Reminder writes and reversals use the parent record version, idempotency keys, transactional audit and rollback. History reads are record-authorized. Reminder actions do not mark financial or legal obligations fulfilled outside this app and do not create a repayment.
 - Email, push, SMS, advance delivery, quiet hours, per-category preferences and assignee-specific notifications are not implemented. No reminder messages were sent during this implementation.
 - Reminder lists currently load all permitted reminders for a small family; history is capped at 100 entries with a limit notice. Cursor pagination and full history export remain pending. Current-record JSON export includes corrected balances but does not include reminder/reversal ledgers.
+
+## Version 0.5.0 private documents
+
+- PDF, PNG, JPEG, UTF-8 TXT/CSV uploads up to 10 MiB, server validation, mandatory ClamAV scan, private S3 adapter and generated object keys. Unconfigured deployments clearly disable uploads.
+- Record-linked metadata, tags/category search, immutable file versions, metadata event history, archive/restore, authenticated downloads and image previews. View/Edit/Export permissions are enforced on the server; archived records reject mutations.
+- Idempotent completed uploads, optimistic publication, logical family quota, explicit upload states, storage-content integrity check and operator dry-run/apply cleanup of stale failed objects. See DOCUMENTS.md for the cross-system failure model and versioned-bucket retention limitation.
+- Limits: 100 documents per record, latest 100 versions/events displayed, 1 GiB logical family allowance. No permanent-delete UI, OCR, Drive OAuth, Office files, resumable uploads or full document export/backup.
+- Live storage/scanner configuration, malware signatures, deployment concurrency and browser interaction remain deployment verification requirements.

@@ -1,3 +1,5 @@
+import * as documents from "@/server/documents";
+import { documentForm } from "@/server/document-files";
 import { getDb } from "@/db";
 import { catalogTypes } from "@/db/schema";
 import { handle, body } from "@/server/http";
@@ -50,6 +52,49 @@ async function handler(
       if (section === "invitations" && path.length === 3 && method === "POST")
         return service.inviteMember(db, familyId, actor, await body(request));
       if (section === "records") {
+        if (action === "documents") {
+          if (path.length === 5 && method === "GET")
+            return documents.listDocuments(db, familyId, actor, id);
+          if (path.length === 5 && method === "POST") {
+            await service.authorized(db, familyId, actor, id, "edit");
+            const file = await documentForm(request);
+            return documents.uploadDocument(
+              db,
+              familyId,
+              actor,
+              id,
+              file.input,
+              file,
+              key,
+            );
+          }
+          if (path.length === 6 && method === "GET")
+            return documents.documentHistory(db, familyId, actor, id, path[5]);
+          if (path.length === 6 && method === "PATCH")
+            return documents.editDocument(
+              db,
+              familyId,
+              actor,
+              id,
+              path[5],
+              await body(request),
+              key,
+            );
+        }
+        if (
+          action === "document-files" &&
+          path.length === 6 &&
+          method === "GET"
+        )
+          return documents.downloadDocument(
+            db,
+            familyId,
+            actor,
+            id,
+            path[5],
+            new URL(request.url).searchParams.get("preview") === "1",
+          );
+
         if (path.length === 3 && method === "POST")
           return service.createRecord(
             db,

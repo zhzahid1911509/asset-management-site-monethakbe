@@ -2,9 +2,11 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.4.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.5.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
+
+- Private scanned document uploads, retained file versions, metadata/history, archive/restore and permission-checked downloads; optional storage/scanner setup.
 
 - Better Auth email/password registration, mandatory email verification, sign-in/out, password reset and database-backed session revocation.
 - Explicit same-origin checks for authentication and application mutations; database-backed authentication throttling.
@@ -96,7 +98,7 @@ The test database is PGlite, running the tracked PostgreSQL schema against synth
 
 ## Known boundaries
 
-Read `docs/STATUS.md` before deployment. AI, document uploads, Drive, email/push reminder delivery, custom roles/categories/fields, historical net-worth reports, multi-currency, PDF/CSV reports, full backup/restore and production observability are not implemented yet. No controls pretend to provide these capabilities.
+Read `docs/STATUS.md` before deployment. AI, Drive, email/push reminder delivery, custom roles/categories/fields, historical net-worth reports, multi-currency, PDF/CSV reports, full backup/restore and production observability are not implemented yet. No controls pretend to provide these capabilities.
 
 The UI translates the main workflows and catalog; auth-provider messages, role names and some validation/detail labels remain English. Full WCAG conformance and browser interaction testing remain outstanding. Simple/Advanced currently controls extra identifiers/version details; it is not yet the full advanced-workflow suite.
 
@@ -125,3 +127,7 @@ See [docs/UPGRADE-0.3.md](docs/UPGRADE-0.3.md). Apply the additive migration bef
 ## Upgrade to 0.4.0
 
 See [docs/UPGRADE-0.4.md](docs/UPGRADE-0.4.md). Apply migration 0003 before starting the app. This release adds in-app reminders and full-payment reversals; email/push reminder delivery is not enabled.
+
+## Upgrade to 0.5.0
+
+See [docs/UPGRADE-0.5.md](docs/UPGRADE-0.5.md). Migration 0004 adds private document metadata, file versions and event history. Record forms support upload, replacement, metadata search/edit, archive/restore, image preview and authenticated download. A private S3-compatible bucket and ClamAV are required to enable uploads; existing features work without them. Setup, permissions, limits and cleanup are documented in [docs/DOCUMENTS.md](docs/DOCUMENTS.md).

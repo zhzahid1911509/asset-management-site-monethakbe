@@ -75,15 +75,13 @@ async function newReminder(patch: Record<string, unknown> = {}) {
 }
 beforeAll(async () => {
   fixture = await testDatabase();
-  await fixture.db
-    .insert(s.user)
-    .values(
-      [owner, viewer, outsider].map((a) => ({
-        ...a,
-        name: a.id,
-        emailVerified: true,
-      })),
-    );
+  await fixture.db.insert(s.user).values(
+    [owner, viewer, outsider].map((a) => ({
+      ...a,
+      name: a.id,
+      emailVerified: true,
+    })),
+  );
   familyId = (
     await service.createFamily(fixture.db, owner, { name: "Tasks family" })
   ).id;
@@ -716,7 +714,12 @@ it("applies the migration journal once and safely skips it on rerun", async () =
           `SELECT count(*)::int AS count FROM drizzle.__drizzle_migrations`,
         )
       ).rows,
-    ).toEqual([{ count: 4 }]);
+    ).toEqual([
+      {
+        count: JSON.parse(readFileSync("drizzle/meta/_journal.json", "utf8"))
+          .entries.length,
+      },
+    ]);
     expect(
       (
         await client.query(

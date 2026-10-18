@@ -2043,3 +2043,11 @@ thead {
     flex-wrap: wrap;
   }
 }
+
+.document-list { padding-left: 1.2rem; }
+.document-list li { margin: .8rem 0; overflow-wrap: anywhere; }
+.document-list button { color: var(--primary, #087f6b); text-decoration: underline; text-align: left; }
+.document-panel { margin: 1rem 0; padding: 1rem; border: 1px solid #dbe5e0; border-radius: 12px; overflow-wrap: anywhere; }
+.document-preview { max-width: 100%; max-height: 420px; object-fit: contain; margin-top: 1rem; }
+.record-documents fieldset { border: 0; padding: 0; margin-top: 1.5rem; min-width: 0; }
+.record-documents legend { font-weight: 700; margin-bottom: 1rem; }
