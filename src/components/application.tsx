@@ -1,4 +1,5 @@
 "use client";
+import { ActivityHistory } from "./activity-history";
 import { NotificationSettings } from "./notification-settings";
 import { Reports } from "./reports";
 import { Brand } from "@/components/brand";
@@ -973,6 +974,7 @@ export function Application({
                         ).values(),
                       )}
                     />
+                    {["owner", "administrator"].includes(data.membership.role) && <ActivityHistory key={`activity:${familyId}`} familyId={familyId} locale={locale} />}
                     <NotificationSettings
                       key={familyId}
                       familyId={familyId}
@@ -1005,7 +1007,7 @@ export function Application({
                 ? "যত্নে রাখুন, মনে রাখুন।"
                 : "A little care for everything that matters."}
             </span>
-            <span>Version 0.8.0</span>
+            <span>Version 0.9.0</span>
           </footer>
         </main>
       </div>

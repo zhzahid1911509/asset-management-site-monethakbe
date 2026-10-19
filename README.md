@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.8.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.9.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -161,3 +161,7 @@ Responsive Android/iOS browser and installed PWA layouts, safe-area spacing, mob
 ## Upgrade to 0.8.0 — Inngest email delivery
 
 Complete Vercel/Inngest setup is in [docs/INNGEST.md](docs/INNGEST.md). Set EMAIL_DELIVERY_MODE=inngest plus the production Inngest keys, deploy, and sync /api/inngest. Immediate events, durable retries, queue recovery and reminder scheduling replace the persistent worker. Existing local worker mode remains supported. No new database migration from 0.7.1.
+
+## Upgrade to 0.9.0 — workspace activity
+
+Owners and administrators can open Settings → Workspace activity to review authorized audit events, filter by action category and Bangladesh calendar dates, and page through older events. Existing records and Inngest configuration are preserved. No new database migration; run npm ci, build and redeploy. See docs/ACTIVITY.md.

@@ -93,3 +93,9 @@ body:has(dialog[open]) { overflow: hidden; }
   .modal { max-height: 100dvh; margin-block: 0; }
   .sidebar .brand-image { width: 110px; }
 }
+
+.activity-list { list-style: none; padding: 0; margin-block: 20px; }
+.activity-list li { padding: 16px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.activity-list p { margin-block: 6px; }
+.activity-list time, .activity-list small { color: var(--muted); font-size: 13px; }
+.activity-list summary { cursor: pointer; padding-block: 8px; }

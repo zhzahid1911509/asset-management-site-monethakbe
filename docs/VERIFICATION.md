@@ -99,3 +99,7 @@ Strict TypeScript passed. Full suite: 145 passed, one stale email-logo expectati
 ## Version 0.8.0 — Inngest
 
 161 tests passed across 16 files. New tests exercise duplicate events, provider retry delays, permanent failure, expired auth messages, abandoned/active/exhausted leases, stale completion fencing, invalid payloads, event-only job IDs, event-publish failure recovery and rejection of unsigned/misconfigured production requests. Strict TypeScript and production webpack build passed, including /api/inngest. Live Vercel/Inngest synchronization, cron operation and real email delivery were not executed.
+
+## Version 0.9.0 — workspace activity
+
+170 tests passed across 17 files, including nine new activity tests. Strict TypeScript and production webpack build passed. Tests cover authorization, cross-family isolation, view-denial filtering before pagination, current membership checks, Bangladesh date boundaries, microsecond/tie pagination and malformed inputs. Browser/real-device interaction and live Neon performance remain unverified. No production data was accessed and no real email was sent.

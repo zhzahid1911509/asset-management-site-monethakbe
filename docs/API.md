@@ -64,3 +64,7 @@ GET/PUT `/api/families/:familyId/notifications` reads/saves the authenticated me
 ## Current reports (0.7.0)
 
 POST `/api/families/:familyId/reports` accepts `{kind:"all"|"asset"|"liability",category:"",includeArchived:false,format:"json"|"csv"}` with those defaults. Reuses current record View+Export checks and an audited repeatable-read snapshot. JSON contains summary/category totals and selected rows; CSV is a no-store UTF-8 attachment. Maximum 5,000 exportable source records; no silent truncation. Unknown fields and unsupported formats are rejected. See THEMES-AND-REPORTS.md.
+
+## Workspace activity
+
+POST `/api/families/:familyId/activity`: active owner/administrator only; strict JSON filters and cursor. Record view-denials applied before pagination. See ACTIVITY.md.

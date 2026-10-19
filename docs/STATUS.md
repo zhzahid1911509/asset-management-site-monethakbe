@@ -17,7 +17,7 @@ A configured deployment still needs a live Neon migration and transaction smoke 
 | Ownership        | Co-owner roles, separate legal/economic shares, dated share revisions                         | Historical net-worth reports, party/member linking and ownership transfer workflows                                    |
 | Permissions      | Fixed role defaults, explicit per-record allow/deny; owner-only invitations/grants/revocation | Custom roles, admin delegation, time-limited grants, transfer/recovery workflows                                       |
 | Membership       | One-time verified-email invitation, expiry, revocation                                        | Re-invitation/reactivation of revoked members and role changes                                                         |
-| Audit            | Append entries transactionally; no audit UI                                                   | Dedicated immutable application DB grants, audit viewing/retention and operational export                              |
+| Audit            | Transactional audit entries and permission-filtered activity viewer                                                   | Dedicated immutable application DB grants, retention and operational export                              |
 | Export           | Current visible/exportable record JSON including details and owners                           | Full history archive, CSV/PDF, asynchronous jobs and restoration                                                       |
 | Catalog          | 131 seeded types, optional typed fields across all 14 categories                              | Editable family catalog, custom fields and guided multi-step forms                                                     |
 | AI               | Not implemented; no key-entry controls                                                        | KMS envelopes, adapters, budgets, failover and confirmation tools                                                      |
@@ -116,3 +116,7 @@ Responsive mobile layout refinements, safe areas, drawer keyboard/focus handling
 ## Version 0.8.0
 
 Inngest event delivery, five-minute queue recovery, fifteen-minute reminder scheduling, shared lease-fenced processor and auth-email expiry. Deploy/sync instructions in INNGEST.md. No new database migration. Live Vercel/Inngest/Resend integration remains a deployment verification step.
+
+## Version 0.9.0
+
+Owner/administrator activity viewer in Settings, action/date filters, microsecond-preserving cursor pagination, current actor/record labels and event identifiers. Explicit record view-denials and family membership are checked for every page. Does not add before/after snapshots, full backups or database-level tamper resistance.
