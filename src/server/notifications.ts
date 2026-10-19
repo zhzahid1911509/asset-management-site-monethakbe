@@ -149,6 +149,7 @@ export async function scheduleReminderEmails(
   db: Db,
   now = new Date(),
   cursor?: string,
+  pageSize = 25,
 ) {
   const page = await db
     .select({
@@ -164,7 +165,7 @@ export async function scheduleReminderEmails(
       ),
     )
     .orderBy(asc(s.notificationPreferences.id))
-    .limit(25);
+    .limit(Math.max(1, Math.min(25, pageSize)));
   let queued = 0;
   for (const item of page)
     queued += await db.transaction(async (q) => {
@@ -260,7 +261,7 @@ export async function scheduleReminderEmails(
     });
   return {
     queued,
-    nextCursor: page.length === 25 ? page.at(-1)!.id : undefined,
+    nextCursor: page.length === Math.max(1, Math.min(25, pageSize)) ? page.at(-1)!.id : undefined,
   };
 }
 export type ReminderGate =

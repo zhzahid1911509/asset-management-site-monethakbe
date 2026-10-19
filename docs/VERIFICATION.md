@@ -95,3 +95,7 @@ Executed with synthetic data and mocked mail transport only:
 ## Version 0.7.1 — mobile interface
 
 Strict TypeScript passed. Full suite: 145 passed, one stale email-logo expectation failed; after updating that expectation, all three email-template tests passed on a targeted rerun. The 146 existing tests are therefore passing across those runs. Production webpack build passed. Browser download failed, so real Android/iOS, viewport, keyboard and visual checks remain unverified; use docs/MOBILE.md. No live storage or email operation was performed.
+
+## Version 0.8.0 — Inngest
+
+161 tests passed across 16 files. New tests exercise duplicate events, provider retry delays, permanent failure, expired auth messages, abandoned/active/exhausted leases, stale completion fencing, invalid payloads, event-only job IDs, event-publish failure recovery and rejection of unsigned/misconfigured production requests. Strict TypeScript and production webpack build passed, including /api/inngest. Live Vercel/Inngest synchronization, cron operation and real email delivery were not executed.

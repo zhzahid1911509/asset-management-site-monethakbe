@@ -1,164 +1,41 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import * as schema from "../src/db/schema";
-import {
-  applyReminderGate,
-  scheduleReminderEmails,
-  reminderDeliveryGate,
-} from "../src/server/notifications";
-import { decodeEmail } from "../src/server/email-delivery";
 import "./load-env";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { randomUUID } from "node:crypto";
-import {
-  deliverEmail,
-  DeliveryError,
-  deliveryHints,
-  senderDomain,
-} from "../src/server/email-delivery";
-const required = [
-  "DATABASE_URL",
-  "RESEND_API_KEY",
-  "EMAIL_FROM",
-  "APP_ENCRYPTION_KEY",
-  "APP_ORIGIN",
-];
-const missing = required.filter((name) => !process.env[name]);
-if (
-  missing.length ||
-  Buffer.from(process.env.APP_ENCRYPTION_KEY ?? "", "base64").length !== 32
-) {
-  console.error(
-    JSON.stringify({
-      event: "email.worker.configuration_error",
-      missing,
-      encryptionKeyValid:
-        Buffer.from(process.env.APP_ENCRYPTION_KEY ?? "", "base64").length ===
-        32,
-    }),
-  );
+import * as schema from "../src/db/schema";
+import { scheduleReminderEmails } from "../src/server/notifications";
+import { processEmailJob, recoverableEmailIds } from "../src/server/email-jobs";
+import { senderDomain } from "../src/server/email-delivery";
+if (process.env.EMAIL_DELIVERY_MODE === "inngest") {
+  console.error("EMAIL_DELIVERY_MODE=inngest: use the synced Inngest app; do not start the standalone worker.");
   process.exit(1);
 }
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 2,
-  connectionTimeoutMillis: 10000,
-  statement_timeout: 15000,
-});
-const db = drizzle(pool, { schema });
-let schedulerCursor: string | undefined;
-let nextSchedule = 0;
+const missing = ["DATABASE_URL", "RESEND_API_KEY", "EMAIL_FROM", "APP_ENCRYPTION_KEY", "APP_ORIGIN"].filter(k => !process.env[k]);
+if (missing.length || Buffer.from(process.env.APP_ENCRYPTION_KEY ?? "", "base64").length !== 32) {
+  console.error(JSON.stringify({event: "email.worker.configuration_error", missing}));
+  process.exit(1);
+}
+const pool = new Pool({connectionString: process.env.DATABASE_URL, max: 2, connectionTimeoutMillis: 10000, statement_timeout: 15000});
+const db = drizzle(pool, {schema});
 let stopping = false;
-process.on("SIGTERM", () => (stopping = true));
-process.on("SIGINT", () => (stopping = true));
-async function run() {
+process.on("SIGTERM", () => {stopping = true;});
+process.on("SIGINT", () => {stopping = true;});
+let cursor: string | undefined;
+let nextSchedule = 0;
+try {
   await pool.query("SELECT 1 FROM email_jobs LIMIT 1");
-  console.log(
-    JSON.stringify({
-      event: "email.worker.ready",
-      senderDomain: senderDomain(process.env.EMAIL_FROM),
-    }),
-  );
+  console.log(JSON.stringify({event: "email.worker.ready", senderDomain: senderDomain(process.env.EMAIL_FROM)}));
   do {
     if (Date.now() >= nextSchedule) {
-      const scheduled = await scheduleReminderEmails(
-        db,
-        new Date(),
-        schedulerCursor,
-      );
-      schedulerCursor = scheduled.nextCursor;
+      const result = await scheduleReminderEmails(db, new Date(), cursor);
+      cursor = result.nextCursor;
       nextSchedule = Date.now() + 15000;
-      if (scheduled.queued)
-        console.log(
-          JSON.stringify({
-            event: "reminders.queued",
-            count: scheduled.queued,
-          }),
-        );
     }
-    // Expire old messages before claiming them, including abandoned old leases.
-    await pool.query(
-      "UPDATE email_jobs SET status='expired',payload='',lease_token=null,lease_until=null WHERE (status IN ('pending','failed') OR status='processing' AND lease_until<now()) AND created_at<now()-interval '12 hours'",
-    );
-    await pool.query(
-      "UPDATE email_jobs SET status='failed',last_error='LEASE_EXHAUSTED' WHERE status='processing' AND lease_until<now() AND attempts>=5",
-    );
-    const lease = randomUUID();
-    const claimed = await pool.query(
-      `UPDATE email_jobs SET status='processing',lease_token=$1,lease_until=now()+interval '60 seconds',attempts=attempts+1 WHERE id=(SELECT id FROM email_jobs WHERE (status='pending' AND available_at<=now() OR status='processing' AND lease_until<now()) AND attempts<5 AND created_at>=now()-interval '12 hours' ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING id,payload,attempts`,
-      [lease],
-    );
-    const job = claimed.rows[0];
-    if (job) {
-      try {
-        const decoded = decodeEmail(job.payload);
-        const gate = await reminderDeliveryGate(
-          db,
-          job.id,
-          decoded.to,
-          new Date(),
-          decoded.kind === "reminder",
-        );
-        if (gate.action !== "send") {
-          await applyReminderGate(db, job.id, lease, gate);
-        } else {
-          const renewed = await pool.query(
-            "UPDATE email_jobs SET lease_until=now()+interval '60 seconds' WHERE id=$1 AND lease_token=$2 AND status='processing' AND lease_until>now()",
-            [job.id, lease],
-          );
-          if (!renewed.rowCount)
-            throw new DeliveryError("EMAIL_LEASE_LOST", true);
-          await deliverEmail(job);
-          const updated = await pool.query(
-            "UPDATE email_jobs SET status='sent',payload='',last_error=null,lease_token=null,lease_until=null WHERE id=$1 AND lease_token=$2",
-            [job.id, lease],
-          );
-          console.log(
-            JSON.stringify({
-              event: updated.rowCount
-                ? "email.provider_accepted"
-                : "email.lease_lost",
-              id: job.id,
-            }),
-          );
-        }
-      } catch (error) {
-        const failure =
-          error instanceof DeliveryError
-            ? error
-            : new DeliveryError("EMAIL_COMPLETION_UNKNOWN", true);
-        const next =
-          failure.retryable && job.attempts < 5 ? "pending" : "failed";
-        const updated = await pool.query(
-          "UPDATE email_jobs SET status=$3,last_error=$4,available_at=now()+($5::double precision * interval '1 second'),lease_token=null,lease_until=null WHERE id=$1 AND lease_token=$2",
-          [job.id, lease, next, failure.code, failure.delaySeconds],
-        );
-        console.error(
-          JSON.stringify({
-            event: updated.rowCount ? "email.failed" : "email.lease_lost",
-            id: job.id,
-            code: failure.code,
-            next,
-            hint:
-              deliveryHints[failure.code] ??
-              "Check email:status and provider configuration; raw email content is not logged.",
-          }),
-        );
-      }
-    }
+    const [job] = await recoverableEmailIds(db);
+    if (job) await processEmailJob(db, job.id);
     if (process.argv.includes("--once")) break;
-    if (!job) await new Promise((resolve) => setTimeout(resolve, 3000));
+    if (!job) await new Promise(resolve => setTimeout(resolve, 3000));
   } while (!stopping);
-}
-try {
-  await run();
 } catch {
-  console.error(
-    JSON.stringify({
-      event: "email.worker.database_error",
-      hint: "Check DATABASE_URL, network/TLS settings, and run db:migrate. Restart the worker after fixing configuration.",
-    }),
-  );
+  console.error(JSON.stringify({event: "email.worker.database_error"}));
   process.exitCode = 1;
-} finally {
-  await pool.end();
-}
+} finally { await pool.end(); }

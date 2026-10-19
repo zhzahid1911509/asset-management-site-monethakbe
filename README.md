@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.7.1 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.8.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -30,7 +30,7 @@ A runnable **Next.js 16 / React / strict TypeScript** application for the first 
 - Node.js 24 LTS (the development build was checked on Node 24.19).
 - npm and a Neon PostgreSQL project.
 - A Resend account with a verified sender/domain, for account verification and invitations.
-- A host capable of running a Next.js Node server and a persistent email worker.
+- A Next.js Node host, plus either the Inngest integration (Vercel) or a persistent email worker.
 
 ## Local setup
 
@@ -157,3 +157,7 @@ Run `npm ci` and restart the app. For production, rebuild before restarting. No 
 ## Upgrade to 0.7.1 — mobile layouts
 
 Responsive Android/iOS browser and installed PWA layouts, safe-area spacing, mobile drawer focus management, readable controls, adaptive dialogs and keyboard-accessible scrolling tables. Includes the recent theme logos and document fixes. Preserve your .env, run npm ci, then build and restart. No new database migration from 0.7.0. See docs/MOBILE.md for device checks and limitations.
+
+## Upgrade to 0.8.0 — Inngest email delivery
+
+Complete Vercel/Inngest setup is in [docs/INNGEST.md](docs/INNGEST.md). Set EMAIL_DELIVERY_MODE=inngest plus the production Inngest keys, deploy, and sync /api/inngest. Immediate events, durable retries, queue recovery and reminder scheduling replace the persistent worker. Existing local worker mode remains supported. No new database migration from 0.7.1.

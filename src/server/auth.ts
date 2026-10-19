@@ -1,3 +1,4 @@
+import { notifyEmailJob } from "./email-events";
 import { emailTemplate, AUTH_LINK_SECONDS } from "./email-templates";
 import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
@@ -69,7 +70,7 @@ let auth: ReturnType<typeof buildAuth> | undefined;
 export function getAuth() {
   if (!configured()) throw new Error("AUTH_NOT_CONFIGURED");
   return (auth ??= buildAuth(getDb(), async (to, url, purpose) => {
-    await getDb()
+    const [job] = await getDb()
       .insert(schema.emailJobs)
       .values({
         payload: seal(
@@ -84,6 +85,7 @@ export function getAuth() {
           ),
           "email",
         ),
-      });
+      }).returning({id: schema.emailJobs.id});
+    await notifyEmailJob(job.id);
   }));
 }

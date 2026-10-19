@@ -1005,7 +1005,7 @@ export function Application({
                 ? "যত্নে রাখুন, মনে রাখুন।"
                 : "A little care for everything that matters."}
             </span>
-            <span>Version 0.7.1</span>
+            <span>Version 0.8.0</span>
           </footer>
         </main>
       </div>

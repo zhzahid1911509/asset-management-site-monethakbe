@@ -112,3 +112,7 @@ This supersedes the earlier release notes that described email reminders as unav
 ## Version 0.7.1
 
 Responsive mobile layout refinements, safe areas, drawer keyboard/focus handling, larger controls, dynamic-height dialogs and scrollable tables. Includes theme-specific supplied logos and document fixes. This remains an installable web app, not a native store binary. Real-device visual checks remain outstanding.
+
+## Version 0.8.0
+
+Inngest event delivery, five-minute queue recovery, fifteen-minute reminder scheduling, shared lease-fenced processor and auth-email expiry. Deploy/sync instructions in INNGEST.md. No new database migration. Live Vercel/Inngest/Resend integration remains a deployment verification step.

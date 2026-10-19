@@ -1,3 +1,4 @@
+import { notifyEmailJob } from "./email-events";
 import { emailTemplate } from "./email-templates";
 import { and, eq, desc, asc, sql } from "drizzle-orm";
 import { createHash, randomBytes } from "node:crypto";
@@ -572,7 +573,7 @@ export async function inviteMember(
     .object({ email: z.string().email().max(254), role })
     .parse(input);
   const token = randomBytes(32).toString("base64url");
-  return db.transaction(async (q) => {
+  const result = await db.transaction(async (q) => {
     const m = await member(q, familyId, a);
     if (m.role !== "owner") throw new AppError("FORBIDDEN", 403);
     const [inv] = await q
@@ -588,15 +589,17 @@ export async function inviteMember(
       .returning();
     const url = new URL("/invite", process.env.APP_ORIGIN);
     url.searchParams.set("token", token);
-    await q.insert(s.emailJobs).values({
+    const [job] = await q.insert(s.emailJobs).values({
       payload: seal(
         JSON.stringify(emailTemplate("invitation", url.toString(), data.email)),
         "email",
       ),
-    });
+    }).returning({id: s.emailJobs.id});
     await audit(q, familyId, a, "member.invited");
-    return { id: inv.id, status: "queued" };
+    return { id: inv.id, status: "queued", jobId: job.id };
   });
+  await notifyEmailJob(result.jobId);
+  return {id: result.id, status: result.status};
 }
 export async function acceptInvitation(db: Db, a: Actor, input: unknown) {
   const { token } = z
