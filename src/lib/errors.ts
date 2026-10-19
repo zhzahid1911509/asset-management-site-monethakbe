@@ -7,6 +7,7 @@ export class AppError extends Error {
   }
 }
 export const safeMessages: Record<string, string> = {
+  HISTORY_EXPORT_LIMIT: "This history exceeds 1,000 rows in a section or the 4 MiB download limit. No partial file was exported.",
   REPORT_LIMIT: "This report exceeds the 5,000-record limit. No partial export was produced.",
   DOCUMENTS_NOT_CONFIGURED:
     "Document storage and scanning need administrator setup.",

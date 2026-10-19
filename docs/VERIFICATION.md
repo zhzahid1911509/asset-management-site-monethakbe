@@ -103,3 +103,7 @@ Strict TypeScript passed. Full suite: 145 passed, one stale email-logo expectati
 ## Version 0.9.0 — workspace activity
 
 170 tests passed across 17 files, including nine new activity tests. Strict TypeScript and production webpack build passed. Tests cover authorization, cross-family isolation, view-denial filtering before pagination, current membership checks, Bangladesh date boundaries, microsecond/tie pagination and malformed inputs. Browser/real-device interaction and live Neon performance remain unverified. No production data was accessed and no real email was sent.
+
+## Version 0.10.0 — record history exports
+
+178 tests passed across 18 files. Eight new tests cover exact decimals, view/export denials, outsiders, histories beyond 100 entries, omission of upload request keys, archived records, payment/reversal links, byte/row-limit failure and audit behavior. Strict TypeScript and production webpack build passed. Browser/mobile save dialogs and live Neon/storage integrations were not exercised; no real email was sent.

@@ -120,3 +120,7 @@ Inngest event delivery, five-minute queue recovery, fifteen-minute reminder sche
 ## Version 0.9.0
 
 Owner/administrator activity viewer in Settings, action/date filters, microsecond-preserving cursor pagination, current actor/record labels and event identifiers. Explicit record view-denials and family membership are checked for every page. Does not add before/after snapshots, full backups or database-level tamper resistance.
+
+## Version 0.10.0
+
+Permission-checked per-record JSON history export with confirmation, consistent snapshot, section counts, financial/ownership/reminder/document metadata, bounded row/byte limits and export audit events. Full workspace archive, uploaded-file backup and restoration remain pending.

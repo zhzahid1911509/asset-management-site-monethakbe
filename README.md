@@ -2,7 +2,7 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.9.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.10.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
 
@@ -165,3 +165,7 @@ Complete Vercel/Inngest setup is in [docs/INNGEST.md](docs/INNGEST.md). Set EMAI
 ## Upgrade to 0.9.0 — workspace activity
 
 Owners and administrators can open Settings → Workspace activity to review authorized audit events, filter by action category and Bangladesh calendar dates, and page through older events. Existing records and Inngest configuration are preserved. No new database migration; run npm ci, build and redeploy. See docs/ACTIVITY.md.
+
+## Upgrade to 0.10.0 — record history download
+
+Open a record with Export permission and choose Download record history. Confirm the download to receive the stored financial, ownership, reminder and document-metadata histories as JSON. Uploaded file bytes and restore functionality are not included. No migration or new environment settings; preserve .env, run npm ci and redeploy. See docs/HISTORY-EXPORT.md.

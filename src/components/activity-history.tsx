@@ -7,6 +7,7 @@ type Page = Awaited<ReturnType<typeof activityHistory>>;
 const groups = ["all","record","asset","liability","document","reminder","member","family","notifications","records"];
 const bnGroups = ["সব","রেকর্ড","সম্পদ","দায়","নথি","অনুস্মারক","সদস্য","পরিবার","বিজ্ঞপ্তি","রপ্তানি"];
 const actions: Record<string,[string,string]> = {
+  "record.history.exported":["Record history exported","রেকর্ডের ইতিহাস রপ্তানি"],
   "record.created":["Record created","রেকর্ড তৈরি"],"record.edited":["Record edited","রেকর্ড সম্পাদনা"],
   "record.archived":["Record archived","রেকর্ড সংরক্ষণ"],"record.restored":["Record restored","রেকর্ড পুনরুদ্ধার"],
   "record.details.updated":["Details updated","বিস্তারিত হালনাগাদ"],"record.access.changed":["Access changed","অনুমতি পরিবর্তন"],

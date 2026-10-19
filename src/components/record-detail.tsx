@@ -5,6 +5,7 @@ import { api, errorText } from "@/lib/client";
 import { formatMoney } from "@/lib/money";
 import { RecordDocuments } from "./record-documents";
 import { RecordMetadata } from "./record-metadata";
+import { HistoryExport } from "./history-export";
 import { RecordHistory } from "./record-history";
 import { Button } from "./button";
 type Row = Awaited<ReturnType<typeof snapshot>>["records"][number];
@@ -303,6 +304,7 @@ export function RecordDetail({
               : "You have read-only access to this record.")}
         </p>
       )}
+      {r.canExport && <HistoryExport key={r.id} familyId={familyId} recordId={r.id} locale={locale} />}
       <RecordDocuments
         key={`docs:${r.id}:${r.version}`}
         record={r}

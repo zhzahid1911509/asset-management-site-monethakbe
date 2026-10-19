@@ -68,3 +68,7 @@ POST `/api/families/:familyId/reports` accepts `{kind:"all"|"asset"|"liability",
 ## Workspace activity
 
 POST `/api/families/:familyId/activity`: active owner/administrator only; strict JSON filters and cursor. Record view-denials applied before pagination. See ACTIVITY.md.
+
+## Record history export
+
+POST `/api/families/:familyId/records/:recordId/history-export` with `{confirmed:true}` returns a private JSON attachment. Requires View and Export; 1,000 entries per collection and 4 MiB total maximum, without partial truncation. See HISTORY-EXPORT.md.

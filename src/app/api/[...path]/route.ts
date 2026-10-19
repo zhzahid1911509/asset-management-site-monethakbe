@@ -1,3 +1,5 @@
+import { historyExportResponse } from "@/server/history-export";
+import { z } from "zod";
 import { activityHistory } from "@/server/activity";
 import { createReport } from "@/server/reports";
 import * as notifications from "@/server/notifications";
@@ -70,6 +72,10 @@ async function handler(
       if (section === "invitations" && path.length === 3 && method === "POST")
         return service.inviteMember(db, familyId, actor, await body(request));
       if (section === "records") {
+        if(action === "history-export" && path.length === 5 && method === "POST") {
+          z.object({confirmed:z.literal(true)}).strict().parse(await body(request));
+          return historyExportResponse(db,familyId,actor,id);
+        }
         if (action === "documents") {
           if (path.length === 5 && method === "GET")
             return documents.listDocuments(db, familyId, actor, id);
