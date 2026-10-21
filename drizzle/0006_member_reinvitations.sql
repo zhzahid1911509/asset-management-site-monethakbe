@@ -1,0 +1,1 @@
+ALTER TABLE "invitations" ADD COLUMN "reactivation_membership_id" uuid;

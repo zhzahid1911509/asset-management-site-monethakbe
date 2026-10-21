@@ -43,6 +43,13 @@
       "when": 1792326573827,
       "tag": "0005_reminder_email_preferences",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792596328474,
+      "tag": "0006_member_reinvitations",
+      "breakpoints": true
     }
   ]
 }

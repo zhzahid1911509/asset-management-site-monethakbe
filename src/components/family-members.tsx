@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { api, errorText } from "@/lib/client";
 import { Modal } from "./modal";
 import { Button } from "./button";
@@ -20,6 +20,8 @@ export function FamilyMembers({
   role: string;
   locale: string;
 }) {
+  const inviteForm = useRef<HTMLFormElement>(null);
+  const [inviteEmail,setInviteEmail] = useState(""), [inviteRole,setInviteRole] = useState("member");
   const [editing, setEditing] = useState<Member | null>(null),
     [nextRole, setNextRole] = useState("member"),
     [confirmed, setConfirmed] = useState(false),
@@ -31,7 +33,7 @@ export function FamilyMembers({
   const bn = locale === "bn";
   useEffect(() => {
     let cancelled = false;
-    setMembers([]); setEditing(null); setError(""); setNotice("");
+    setInviteEmail(""); setInviteRole("member"); setMembers([]); setEditing(null); setError(""); setNotice("");
     if (["owner", "administrator"].includes(role))
       api<Member[]>(`families/${familyId}/members`)
         .then((data) => { if (!cancelled) setMembers(data); })
@@ -85,6 +87,13 @@ export function FamilyMembers({
                     : ""}
                 </small>
               </span>
+              {role === "owner" && m.role !== "owner" && (!m.active || (m.expiresAt && new Date(m.expiresAt) <= new Date())) && (
+                <Button variant="secondary" disabled={busy} onClick={() => {
+                  setInviteEmail(m.email); setInviteRole("read-only"); setNotice(""); setError("");
+                  inviteForm.current?.scrollIntoView({block:"center",behavior:"smooth"});
+                  (inviteForm.current?.elements.namedItem("email") as HTMLInputElement | null)?.focus({preventScroll:true});
+                }}>{bn ? "আবার আমন্ত্রণ" : "Re-invite"}</Button>
+              )}
               {role === "owner" && m.role !== "owner" && m.active &&
                 (!m.expiresAt || new Date(m.expiresAt) > new Date()) && (
                 <Button variant="secondary" disabled={busy} onClick={() => {
@@ -129,7 +138,10 @@ export function FamilyMembers({
               ? "ইমেইলে আমন্ত্রণ যাবে। লিংক ৪৮ ঘণ্টা কার্যকর থাকবে।"
               : "An invitation email will be queued. The link expires in 48 hours."}
           </p>
-          <form
+          <p className="notice">{bn
+            ? "বাতিল বা মেয়াদোত্তীর্ণ সদস্য নতুন আমন্ত্রণ গ্রহণ করে ফিরতে পারবেন। পুরোনো রেকর্ডের অনুমতি মুছে যাবে এবং অনুস্মারক ইমেইল বন্ধ থাকবে। নতুন আমন্ত্রণ পাঠালে আগের লিংক অকার্যকর হবে।"
+            : "Revoked or expired members can return by accepting a new invitation. Their old record permissions will be cleared and reminder emails turned off. Sending a new invitation replaces earlier links."}</p>
+          <form ref={inviteForm}
             onSubmit={async (e) => {
               e.preventDefault();
               const form = e.currentTarget,
@@ -146,7 +158,7 @@ export function FamilyMembers({
                     ? "আমন্ত্রণ ইমেইল পাঠানোর জন্য সারিতে রাখা হয়েছে।"
                     : "Invitation queued for email delivery.",
                 );
-                form.reset();
+                form.reset(); setInviteEmail(""); setInviteRole("member");
               } catch (e) {
                 setError(errorText(e));
               } finally {
@@ -156,11 +168,11 @@ export function FamilyMembers({
           >
             <label>
               {bn ? "ইমেইল" : "Email"}
-              <input type="email" name="email" required />
+              <input type="email" name="email" value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} disabled={busy} required />
             </label>
             <label>
               {bn ? "ভূমিকা" : "Role"}
-              <select name="role" defaultValue="member">
+              <select name="role" value={inviteRole} onChange={e=>setInviteRole(e.target.value)} disabled={busy}>
                 <option value="member">Family member</option>
                 <option value="read-only">Read-only member</option>
                 <option value="asset-manager">Asset manager</option>

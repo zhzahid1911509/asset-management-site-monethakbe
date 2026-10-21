@@ -20,6 +20,7 @@ export default function Page() {
         <a className="text-link" href="/auth">
           Sign in (then reopen your invitation)
         </a>
+        <p>If you are rejoining, old record permissions are cleared and reminder emails start disabled. Ask the family owner to grant the access you need.</p>
         <p>Adviser access expires after 30 days in this foundation release.</p>
         {error && (
           <p role="alert" className="notice error">

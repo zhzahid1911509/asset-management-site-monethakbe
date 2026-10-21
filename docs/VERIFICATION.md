@@ -122,3 +122,10 @@ Strict TypeScript passed. Full suite: 145 passed, one stale email-logo expectati
 - Strict TypeScript check and production webpack build passed.
 - Six Chromium component browser scenarios passed at 320px, 390px and 1024px in English/Bengali. Real FamilyMembers/Modal components used production CSS and a mocked API. Checked confirmation gating, role-change PATCH payload, successful modal closure and horizontal containment.
 - No real emails sent or live database modified. Physical mobile devices, full signed-in browser flows and deployed integration remain untested in this release.
+
+## 0.12.0 — re-invitation and reactivation (21 October 2026)
+
+- All 194 tests across 20 files passed against synthetic embedded PostgreSQL, including eight new re-invitation tests. Coverage: acceptance-only reactivation, stable membership identity, grant removal and notification reset, adviser expiry, superseded links, revocation cancellation, owner-only issuance, active member rejection, email binding, issuer authority and legacy-token rejection.
+- Additive migration 0006 is applied by the test database fixture. Production webpack build and TypeScript checks passed.
+- Six Chromium component scenarios passed at 320/390/1024px in English/Bengali: inactive-member Re-invite, email prefill, read-only default, invitation request payload, success notice and horizontal containment. API responses were mocked; no actual invitation was delivered.
+- Physical devices, real provider delivery and concurrent multi-connection Neon transactions were not exercised.

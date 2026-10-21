@@ -263,6 +263,7 @@ export const recordGrants = pgTable(
   ],
 );
 export const invitations = pgTable("invitations", {
+  reactivationMembershipId: uuid("reactivation_membership_id"),
   id: uuid("id").defaultRandom().primaryKey(),
   familyId: uuid("family_id")
     .notNull()

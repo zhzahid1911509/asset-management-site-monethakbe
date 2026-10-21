@@ -531,6 +531,7 @@ export async function revokeMember(
 ) {
   uuid.parse(id);
   return db.transaction(async (q) => {
+    await lockInvitations(q, familyId);
     const m = await member(q, familyId, a);
     if (m.role !== "owner") throw new AppError("FORBIDDEN", 403);
     const [target] = await q
@@ -546,6 +547,11 @@ export async function revokeMember(
       .update(s.memberships)
       .set({ active: false })
       .where(eq(s.memberships.id, id));
+    const [profile] = await q.select({email:s.user.email}).from(s.user).where(eq(s.user.id,target.userId));
+    if (profile) await q.update(s.invitations).set({expiresAt:new Date()}).where(and(
+      eq(s.invitations.familyId,familyId), eq(s.invitations.email,profile.email.toLowerCase()),
+      sql`${s.invitations.acceptedAt} is null`,
+    ));
     await audit(q, familyId, a, "member.revoked");
     return { ok: true };
   });
@@ -595,6 +601,11 @@ export async function setGrant(
     return { ok: true };
   });
 }
+// Serialize invitations, acceptance and revocation per family. This also
+// prevents two distinct invitation tokens creating the same membership.
+async function lockInvitations(q: Tx, familyId: string) {
+  await q.execute(sql`select pg_advisory_xact_lock(hashtextextended(${familyId + ":invitations"},0))`);
+}
 export async function inviteMember(
   db: Db,
   familyId: string,
@@ -602,17 +613,31 @@ export async function inviteMember(
   input: unknown,
 ) {
   const data = z
-    .object({ email: z.string().email().max(254), role })
+    .strictObject({ email: z.string().trim().email().max(254), role })
     .parse(input);
   const token = randomBytes(32).toString("base64url");
   const result = await db.transaction(async (q) => {
+    await lockInvitations(q, familyId);
     const m = await member(q, familyId, a);
     if (m.role !== "owner") throw new AppError("FORBIDDEN", 403);
+    const email = data.email.toLowerCase();
+    const [target] = await q.select({membership:s.memberships}).from(s.memberships)
+      .innerJoin(s.user,eq(s.user.id,s.memberships.userId))
+      .where(and(eq(s.memberships.familyId,familyId),sql`lower(${s.user.email}) = ${email}`));
+    if (target && (target.membership.role === "owner" || isActive(target.membership)))
+      throw new AppError("MEMBER_ALREADY_ACTIVE",409);
+    // Only the latest invitation remains usable. Queued old emails may still
+    // arrive, but their tokens cannot grant access.
+    await q.update(s.invitations).set({expiresAt:new Date()}).where(and(
+      eq(s.invitations.familyId,familyId),eq(s.invitations.email,email),
+      sql`${s.invitations.acceptedAt} is null`,
+    ));
     const [inv] = await q
       .insert(s.invitations)
       .values({
         familyId,
         email: data.email.toLowerCase(),
+        reactivationMembershipId: target?.membership.id ?? null,
         role: data.role,
         tokenHash: hash(token),
         createdBy: a.id,
@@ -627,7 +652,7 @@ export async function inviteMember(
         "email",
       ),
     }).returning({id: s.emailJobs.id});
-    await audit(q, familyId, a, "member.invited");
+    await audit(q, familyId, a, target ? "member.reinvited" : "member.invited");
     return { id: inv.id, status: "queued", jobId: job.id };
   });
   await notifyEmailJob(result.jobId);
@@ -638,6 +663,10 @@ export async function acceptInvitation(db: Db, a: Actor, input: unknown) {
     .object({ token: z.string().min(32).max(200) })
     .parse(input);
   return db.transaction(async (q) => {
+    const [candidate] = await q.select({familyId:s.invitations.familyId}).from(s.invitations)
+      .where(eq(s.invitations.tokenHash,hash(token)));
+    if (!candidate) throw new AppError("INVALID_INVITATION",400);
+    await lockInvitations(q,candidate.familyId);
     const [inv] = await q
       .select()
       .from(s.invitations)
@@ -646,10 +675,15 @@ export async function acceptInvitation(db: Db, a: Actor, input: unknown) {
     if (
       !inv ||
       inv.acceptedAt ||
-      inv.expiresAt < new Date() ||
+      inv.expiresAt <= new Date() ||
       inv.email !== a.email.toLowerCase()
     )
       throw new AppError("INVALID_INVITATION", 400);
+    const [issuer] = await q.select().from(s.memberships).where(and(
+      eq(s.memberships.familyId,inv.familyId),eq(s.memberships.userId,inv.createdBy),
+    )).for("share");
+    if (!issuer || issuer.role !== "owner" || !isActive(issuer))
+      throw new AppError("INVALID_INVITATION",400);
     const [existing] = await q
       .select()
       .from(s.memberships)
@@ -658,9 +692,21 @@ export async function acceptInvitation(db: Db, a: Actor, input: unknown) {
           eq(s.memberships.familyId, inv.familyId),
           eq(s.memberships.userId, a.id),
         ),
-      );
-    if (existing) throw new AppError("INVALID_INVITATION", 400);
-    await q.insert(s.memberships).values({
+      ).for("update");
+    if (existing && (existing.role === "owner" || isActive(existing) || inv.reactivationMembershipId !== existing.id))
+      throw new AppError("INVALID_INVITATION", 400);
+    if (existing) {
+      // Rejoining starts a new access period. Historical authorship is kept,
+      // but stale grants and old email opt-ins must not spring back to life.
+      await q.delete(s.recordGrants).where(and(eq(s.recordGrants.familyId,inv.familyId),
+        eq(s.recordGrants.membershipId,existing.id)));
+      await q.update(s.notificationPreferences).set({enabled:false,
+        version:sql`${s.notificationPreferences.version}+1`,updatedAt:new Date()})
+        .where(and(eq(s.notificationPreferences.familyId,inv.familyId),eq(s.notificationPreferences.userId,a.id)));
+      await q.update(s.memberships).set({active:true,role:inv.role,
+        expiresAt:inv.role === "adviser" ? new Date(Date.now()+30*86400_000) : null,
+      }).where(eq(s.memberships.id,existing.id));
+    } else await q.insert(s.memberships).values({
       familyId: inv.familyId,
       userId: a.id,
       role: inv.role,
@@ -671,7 +717,7 @@ export async function acceptInvitation(db: Db, a: Actor, input: unknown) {
       .update(s.invitations)
       .set({ acceptedAt: new Date() })
       .where(eq(s.invitations.id, inv.id));
-    await audit(q, inv.familyId, a, "member.joined");
+    await audit(q, inv.familyId, a, existing ? "member.rejoined" : "member.joined");
     return { id: inv.familyId };
   });
 }

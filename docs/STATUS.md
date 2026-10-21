@@ -128,3 +128,7 @@ Permission-checked per-record JSON history export with confirmation, consistent 
 ## Version 0.11.0
 
 Owners can change active non-owner membership roles in Settings. Server-side authorization, locked target updates, expected-role comparison, confirmation, expiry preservation and identifiable role-change audit events are implemented. Existing record grants/denials remain authoritative. This supersedes the table's pending role-change item. Revoked-member reactivation, ownership transfer/recovery and custom roles remain pending.
+
+## Version 0.12.0
+
+Revoked/expired members can be re-invited and return by accepting a fresh email-bound invitation. Old grants and reminder-email opt-ins are cleared on return; stable membership identity and authored records remain. Superseded links and pending links at revocation are invalidated. A dedicated invitation marker prevents legacy tokens restoring revoked access. Migration 0006 is required. Ownership transfer/recovery and custom roles remain pending. Development/build scripts now default to Webpack for compatibility with the user's blocked native compiler on Windows.
