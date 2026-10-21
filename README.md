@@ -2,9 +2,11 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.10.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.11.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
+
+- Owner-controlled member role changes, confirmation, expiry preservation and auditable old/new roles. See docs/MEMBER-ROLES.md.
 
 - Private scanned document uploads, retained file versions, metadata/history, archive/restore and permission-checked downloads; optional storage/scanner setup.
 

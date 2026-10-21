@@ -99,3 +99,67 @@ body:has(dialog[open]) { overflow: hidden; }
 .activity-list p { margin-block: 6px; }
 .activity-list time, .activity-list small { color: var(--muted); font-size: 13px; }
 .activity-list summary { cursor: pointer; padding-block: 8px; }
+
+/* Dialog containment: explicit tracks prevent native select/date intrinsic widths
+   from growing the sheet. Only the content pane scrolls; close stays visible. */
+.modal {
+  box-sizing: border-box;
+  position: fixed;
+  inset: 16px 0;
+  width: min(590px, calc(100% - 32px));
+  min-width: 0;
+  max-width: calc(100% - 32px);
+  max-height: calc(var(--dialog-height, 100dvh) - 32px);
+  padding: 0;
+  overflow: hidden;
+}
+.modal[open] { display: flex; flex-direction: column; }
+.modal > header {
+  flex: 0 0 auto; min-width: 0; margin: 0;
+  padding: 16px 20px; background: var(--white);
+}
+.modal > header h2 { min-width: 0; overflow-wrap: anywhere; }
+.modal-body {
+  flex: 1 1 auto; min-height: 0; min-width: 0; width: 100%;
+  padding: 20px; overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  scroll-padding-block: 16px;
+}
+.modal-body :is(form, fieldset, details, label, .form-grid, .section-form, .document-panel) { min-width: 0; max-width: 100%; }
+.modal-body fieldset { margin-inline: 0; }
+.modal-body .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.modal-body :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%;
+}
+.modal-body :is(p, small, label, summary, button) { overflow-wrap: anywhere; }
+.modal-body :is(input, select, textarea, button) { scroll-margin-block: 16px; }
+@media screen and (max-width: 600px) {
+  .modal {
+    inset: var(--dialog-top, 0px) 0 auto 0;
+    margin: 0; width: 100%; max-width: 100%;
+    height: var(--dialog-height, 100dvh); max-height: var(--dialog-height, 100dvh);
+    border: 0; border-radius: 0;
+  }
+  .modal > header {
+    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left));
+  }
+  .modal-body {
+    padding: 16px max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+  .modal-body .form-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .modal-body input::-webkit-date-and-time-value { text-align: start; min-width: 0; }
+  .modal-body input[type="date"] { appearance: none; }
+  .record-form .full { width: 100%; min-height: 48px; }
+  .table-toolbar { flex-direction: column; }
+  .home-actions, .report-actions, .reminder-actions { flex-wrap: wrap; }
+  .page-heading, .topbar, .home-header, .member-list li { min-width: 0; }
+  .report-filters { min-width: 0; }
+  .notification-checks { grid-template-columns: minmax(0, 1fr); }
+  .home-header nav { gap: 8px; }
+  .home-header nav .button { padding-inline: 12px; }
+}
+
+/* Member actions remain usable on narrow settings screens. */
+.member-list > div { flex-wrap: wrap; min-width: 0; }
+.member-list > div > span:nth-child(2) { flex: 1 1 180px; min-width: 0; overflow-wrap: anywhere; }
+.member-list > div > .button { margin-left: 0; }

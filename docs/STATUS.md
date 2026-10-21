@@ -124,3 +124,7 @@ Owner/administrator activity viewer in Settings, action/date filters, microsecon
 ## Version 0.10.0
 
 Permission-checked per-record JSON history export with confirmation, consistent snapshot, section counts, financial/ownership/reminder/document metadata, bounded row/byte limits and export audit events. Full workspace archive, uploaded-file backup and restoration remain pending.
+
+## Version 0.11.0
+
+Owners can change active non-owner membership roles in Settings. Server-side authorization, locked target updates, expected-role comparison, confirmation, expiry preservation and identifiable role-change audit events are implemented. Existing record grants/denials remain authoritative. This supersedes the table's pending role-change item. Revoked-member reactivation, ownership transfer/recovery and custom roles remain pending.

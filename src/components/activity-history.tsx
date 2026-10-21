@@ -20,6 +20,12 @@ const actions: Record<string,[string,string]> = {
   "reminder.created":["Reminder created","অনুস্মারক তৈরি"],"reminder.updated":["Reminder updated","অনুস্মারক হালনাগাদ"],
   "notifications.preferences-updated":["Email preferences updated","ইমেইল পছন্দ হালনাগাদ"],
 };
+function actionLabel(action:string,bn:boolean) {
+  const parts=action.split(":");
+  if(parts.length===4 && parts[0]==="member.role.changed")
+    return `${bn ? "সদস্যের ভূমিকা পরিবর্তন" : "Member role changed"}: ${parts[2]} → ${parts[3]} (${parts[1]})`;
+  return actions[action]?.[bn?1:0] ?? action;
+}
 export function ActivityHistory({familyId,locale}:{familyId:string;locale:string}) {
   const bn=locale==="bn";
   const [filters,setFilters]=useState({group:"all",from:"",to:""});
@@ -51,7 +57,7 @@ export function ActivityHistory({familyId,locale}:{familyId:string;locale:string
     {error&&<p className="notice error" role="alert">{error}</p>}
     {!busy&&!error&&!page.entries.length&&<p role="status">{bn?"এই ফিল্টারে কোনো কার্যক্রম নেই।":"No activity matches these filters."}</p>}
     <ol className="activity-list">{page.entries.map(entry=><li key={entry.id}>
-      <strong>{actions[entry.action]?.[bn?1:0]??entry.action}</strong>
+      <strong>{actionLabel(entry.action,bn)}</strong>
       <p>{entry.recordName??(bn?"কর্মক্ষেত্র":"Workspace")} · {entry.actorName??(bn?"অজানা ব্যবহারকারী":"Unknown user")}</p>
       <time dateTime={entry.time}>{new Date(entry.time).toLocaleString(bn?"bn-BD":"en-GB",{timeZone:"Asia/Dhaka"})}</time>
       <details><summary>{bn?"ইভেন্টের তথ্য":"Event details"}</summary><small>{entry.action}<br/>{entry.id}</small></details>

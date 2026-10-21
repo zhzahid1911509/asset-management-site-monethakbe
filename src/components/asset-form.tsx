@@ -98,7 +98,6 @@ export function AssetForm({
       <label>
         {bn ? "নাম" : "Record name"}
         <input
-          autoFocus
           {...f.register("name")}
           placeholder={
             kind === "asset" ? "e.g. Family apartment" : "e.g. Home loan"

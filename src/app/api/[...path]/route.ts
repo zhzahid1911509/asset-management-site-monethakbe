@@ -66,6 +66,8 @@ async function handler(
       if (section === "members") {
         if (path.length === 3 && method === "GET")
           return service.listMembers(db, familyId, actor);
+        if (path.length === 4 && method === "PATCH")
+          return service.changeMemberRole(db, familyId, actor, id, await body(request));
         if (path.length === 4 && method === "DELETE")
           return service.revokeMember(db, familyId, actor, id);
       }

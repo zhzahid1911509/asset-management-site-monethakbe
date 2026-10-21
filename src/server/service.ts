@@ -8,6 +8,7 @@ import * as s from "../db/schema";
 import { can, canCreate, isActive, type Action } from "../lib/policy";
 import { AppError } from "../lib/errors";
 import {
+  memberRoleInput,
   recordInput,
   patchInput,
   valuationInput,
@@ -489,6 +490,37 @@ export async function listMembers(db: Db, familyId: string, a: Actor) {
       .from(s.memberships)
       .innerJoin(s.user, eq(s.user.id, s.memberships.userId))
       .where(eq(s.memberships.familyId, familyId));
+  });
+}
+export async function changeMemberRole(
+  db: Db, familyId: string, a: Actor, id: string, input: unknown,
+) {
+  uuid.parse(id);
+  const data = memberRoleInput.parse(input);
+  return db.transaction(async (q) => {
+    const actorMembership = await member(q, familyId, a);
+    if (actorMembership.role !== "owner") throw new AppError("FORBIDDEN", 403);
+    const [target] = await q.select().from(s.memberships).where(and(
+      eq(s.memberships.familyId, familyId), eq(s.memberships.id, id),
+    )).for("update");
+    if (!target || target.role === "owner" || target.userId === a.id)
+      throw new AppError("FORBIDDEN", 403);
+    if (!isActive(target)) throw new AppError("MEMBER_INACTIVE", 409);
+    if (target.role !== data.expectedRole) throw new AppError("MEMBER_CONFLICT", 409);
+    if (target.role === data.role) return { ok: true };
+    // A role edit never renews an expiry. Newly assigned advisers receive at
+    // most 30 days; an existing shorter expiry remains authoritative.
+    const adviserLimit = new Date(Date.now() + 30 * 86400000);
+    const expiresAt = data.role === "adviser" &&
+      (!target.expiresAt || target.expiresAt > adviserLimit)
+      ? adviserLimit : target.expiresAt;
+    await q.update(s.memberships).set({ role: data.role, expiresAt })
+      .where(and(eq(s.memberships.familyId, familyId), eq(s.memberships.id, id)));
+    // Store a structured event in the existing audit action namespace. No
+    // names/emails or record data are copied into the audit event.
+    await audit(q, familyId, a,
+      `member.role.changed:${target.id}:${target.role}:${data.role}`);
+    return { ok: true };
   });
 }
 export async function revokeMember(

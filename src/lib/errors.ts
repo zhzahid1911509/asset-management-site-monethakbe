@@ -7,6 +7,8 @@ export class AppError extends Error {
   }
 }
 export const safeMessages: Record<string, string> = {
+  MEMBER_CONFLICT: "This member’s role changed. Refresh the member list and review it again.",
+  MEMBER_INACTIVE: "Revoked or expired memberships cannot be changed here.",
   HISTORY_EXPORT_LIMIT: "This history exceeds 1,000 rows in a section or the 4 MiB download limit. No partial file was exported.",
   REPORT_LIMIT: "This report exceeds the 5,000-record limit. No partial export was produced.",
   DOCUMENTS_NOT_CONFIGURED:

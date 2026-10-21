@@ -1,10 +1,10 @@
 {
   "name": "monethakbe",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/dev.mjs",
-    "build": "next build",
+    "dev": "node scripts/dev.mjs --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -12,7 +12,7 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
     "worker:email": "tsx scripts/email-worker.ts",
-    "dev:web": "next dev",
+    "dev:web": "next dev --webpack",
     "email:status": "tsx scripts/email-status.ts",
     "documents:cleanup": "tsx scripts/document-cleanup.ts"
   },

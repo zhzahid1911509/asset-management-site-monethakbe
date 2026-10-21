@@ -107,3 +107,18 @@ Strict TypeScript passed. Full suite: 145 passed, one stale email-logo expectati
 ## Version 0.10.0 — record history exports
 
 178 tests passed across 18 files. Eight new tests cover exact decimals, view/export denials, outsiders, histories beyond 100 entries, omission of upload request keys, archived records, payment/reversal links, byte/row-limit failure and audit behavior. Strict TypeScript and production webpack build passed. Browser/mobile save dialogs and live Neon/storage integrations were not exercised; no real email was sent.
+
+## 0.10.1 — mobile modal regression fix (19 October 2026)
+
+- Strict TypeScript check and Next.js production webpack build passed.
+- All 178 tests across 18 files passed.
+- Chromium component harness using the real Modal and AssetForm components, complete seed catalog and production-built CSS passed 32 viewport/theme/language combinations: 320×568, 360×640, 375×667, 390×844, 430×932, 768×1024, 1024×768 and 844×390; each in English/Bengali and light/dark mode.
+- Checks opened Add asset, selected property, expanded category fields, asserted dialog/field horizontal containment and dialog vertical containment, scrolled to Save and closed the dialog. No live record was submitted.
+- Physical Android/iOS devices, Safari rendering and native software-keyboard behavior were not exercised. The device acceptance checklist is in MOBILE.md. This is component layout coverage, not a signed-in full application browser test.
+
+## 0.11.0 — member roles (21 October 2026)
+
+- 186 tests across 19 files passed, including eight new membership tests covering owner-only updates, self/owner protection, role/confirmation validation, stale role conflict, inactive/expired/cross-family rejection, adviser caps, explicit view-denial preservation, implicit access removal after demotion and no-op audit behavior.
+- Strict TypeScript check and production webpack build passed.
+- Six Chromium component browser scenarios passed at 320px, 390px and 1024px in English/Bengali. Real FamilyMembers/Modal components used production CSS and a mocked API. Checked confirmation gating, role-change PATCH payload, successful modal closure and horizontal containment.
+- No real emails sent or live database modified. Physical mobile devices, full signed-in browser flows and deployed integration remain untested in this release.

@@ -73,3 +73,9 @@ export const reversalInput = z.strictObject({
   reversedOn: date,
   reason: z.string().trim().min(3).max(500),
 });
+
+export const memberRoleInput = z.strictObject({
+  role,
+  expectedRole: role,
+  confirmed: z.literal(true),
+});
