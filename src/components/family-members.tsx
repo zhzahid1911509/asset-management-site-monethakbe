@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { api, errorText } from "@/lib/client";
+import { PendingInvitations } from "./pending-invitations";
 import { Modal } from "./modal";
 import { Button } from "./button";
 type Member = {
@@ -20,6 +21,7 @@ export function FamilyMembers({
   role: string;
   locale: string;
 }) {
+  const [invitationRefresh,setInvitationRefresh]=useState(0);
   const inviteForm = useRef<HTMLFormElement>(null);
   const [inviteEmail,setInviteEmail] = useState(""), [inviteRole,setInviteRole] = useState("member");
   const [editing, setEditing] = useState<Member | null>(null),
@@ -113,6 +115,7 @@ export function FamilyMembers({
                         `families/${familyId}/members/${m.id}`,
                         "DELETE",
                       );
+                      setInvitationRefresh(v=>v+1);
                       setMembers(
                         await api<Member[]>(`families/${familyId}/members`),
                       );
@@ -158,7 +161,7 @@ export function FamilyMembers({
                     ? "আমন্ত্রণ ইমেইল পাঠানোর জন্য সারিতে রাখা হয়েছে।"
                     : "Invitation queued for email delivery.",
                 );
-                form.reset(); setInviteEmail(""); setInviteRole("member");
+                form.reset(); setInviteEmail(""); setInviteRole("member"); setInvitationRefresh(v=>v+1);
               } catch (e) {
                 setError(errorText(e));
               } finally {
@@ -186,6 +189,7 @@ export function FamilyMembers({
           </form>
         </section>
       )}
+      {role === "owner" && <PendingInvitations key={familyId} familyId={familyId} locale={locale} refreshKey={invitationRefresh} />}
       {editing && <Modal title={bn ? "সদস্যের ভূমিকা পরিবর্তন" : "Change member role"}
         onClose={() => setEditing(null)}>
         <form onSubmit={async e => {

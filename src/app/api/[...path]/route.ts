@@ -71,8 +71,19 @@ async function handler(
         if (path.length === 4 && method === "DELETE")
           return service.revokeMember(db, familyId, actor, id);
       }
-      if (section === "invitations" && path.length === 3 && method === "POST")
-        return service.inviteMember(db, familyId, actor, await body(request));
+      if (section === "invitations") {
+        if (path.length === 3 && method === "GET") {
+          const params=new URL(request.url).searchParams;
+          return service.listPendingInvitations(db,familyId,actor,{
+            ...(params.has("before") ? {before:params.get("before")} : {}),
+            ...(params.has("beforeId") ? {beforeId:params.get("beforeId")} : {}),
+          });
+        }
+        if (path.length === 3 && method === "POST")
+          return service.inviteMember(db, familyId, actor, await body(request));
+        if (path.length === 4 && method === "DELETE")
+          return service.cancelInvitation(db,familyId,actor,id,await body(request));
+      }
       if (section === "records") {
         if(action === "history-export" && path.length === 5 && method === "POST") {
           z.object({confirmed:z.literal(true)}).strict().parse(await body(request));

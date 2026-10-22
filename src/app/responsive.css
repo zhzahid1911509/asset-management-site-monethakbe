@@ -163,3 +163,7 @@ body:has(dialog[open]) { overflow: hidden; }
 .member-list > div { flex-wrap: wrap; min-width: 0; }
 .member-list > div > span:nth-child(2) { flex: 1 1 180px; min-width: 0; overflow-wrap: anywhere; }
 .member-list > div > .button { margin-left: 0; }
+
+.pending-invitation-list article { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding-block:16px; border-bottom:1px solid var(--line); }
+.pending-invitation-list article > div { flex:1 1 200px; min-width:0; overflow-wrap:anywhere; }
+.pending-invitation-list article p { margin-block:4px; }

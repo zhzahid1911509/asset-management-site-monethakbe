@@ -132,3 +132,7 @@ Owners can change active non-owner membership roles in Settings. Server-side aut
 ## Version 0.12.0
 
 Revoked/expired members can be re-invited and return by accepting a fresh email-bound invitation. Old grants and reminder-email opt-ins are cleared on return; stable membership identity and authored records remain. Superseded links and pending links at revocation are invalidated. A dedicated invitation marker prevents legacy tokens restoring revoked access. Migration 0006 is required. Ownership transfer/recovery and custom roles remain pending. Development/build scripts now default to Webpack for compatibility with the user's blocked native compiler on Windows.
+
+## Version 0.13.0
+
+Owners can view pending invitations, inspect expiry in Dhaka time, paginate and cancel unused links. Cancellation uses the invitation transaction lock and records an audit event; accepted invitations cannot be cancelled. No new migration. Supersedes the pending invitation management limitation in the previous release. Ownership transfer/recovery, custom roles, AI, Drive and full backup/restore remain unfinished.

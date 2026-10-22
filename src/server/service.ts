@@ -606,6 +606,46 @@ export async function setGrant(
 async function lockInvitations(q: Tx, familyId: string) {
   await q.execute(sql`select pg_advisory_xact_lock(hashtextextended(${familyId + ":invitations"},0))`);
 }
+export async function listPendingInvitations(db: Db, familyId: string, a: Actor, input: unknown = {}) {
+  const data = z.strictObject({
+    before: z.string().datetime().optional(),
+    beforeId: uuid.optional(),
+  }).refine(v => Boolean(v.before) === Boolean(v.beforeId)).parse(input);
+  return db.transaction(async q => {
+    const m = await member(q,familyId,a);
+    if (m.role !== "owner") throw new AppError("FORBIDDEN",403);
+    const rows = await q.select({
+      id:s.invitations.id,email:s.invitations.email,role:s.invitations.role,
+      expiresAt:s.invitations.expiresAt,
+      createdAt:sql<string>`to_char(${s.invitations.createdAt} at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+      reactivation:sql<boolean>`${s.invitations.reactivationMembershipId} is not null`,
+    }).from(s.invitations).where(and(
+      eq(s.invitations.familyId,familyId),sql`${s.invitations.acceptedAt} is null`,
+      sql`${s.invitations.expiresAt} > now()`,
+      data.before ? sql`(${s.invitations.createdAt},${s.invitations.id}) < (${data.before}::timestamptz,${data.beforeId}::uuid)` : undefined,
+    )).orderBy(desc(s.invitations.createdAt),desc(s.invitations.id)).limit(26);
+    const entries=rows.slice(0,25),last=entries.at(-1);
+    return {entries,nextCursor:rows.length>25 && last ? {before:last.createdAt,beforeId:last.id} : null};
+  });
+}
+export async function cancelInvitation(db: Db, familyId: string, a: Actor, id: string, input: unknown) {
+  uuid.parse(id);
+  z.strictObject({confirmed:z.literal(true)}).parse(input);
+  return db.transaction(async q => {
+    await lockInvitations(q,familyId);
+    const m=await member(q,familyId,a);
+    if(m.role!=="owner") throw new AppError("FORBIDDEN",403);
+    const [inv]=await q.select().from(s.invitations).where(and(
+      eq(s.invitations.id,id),eq(s.invitations.familyId,familyId),
+    )).for("update");
+    if(!inv) throw new AppError("NOT_FOUND",404);
+    if(inv.acceptedAt) throw new AppError("INVITATION_ACCEPTED",409);
+    if(inv.expiresAt<=new Date()) return {ok:true};
+    await q.update(s.invitations).set({expiresAt:new Date()}).where(eq(s.invitations.id,id));
+    await audit(q,familyId,a,`member.invitation.cancelled:${id}`);
+    return {ok:true};
+  });
+}
 export async function inviteMember(
   db: Db,
   familyId: string,

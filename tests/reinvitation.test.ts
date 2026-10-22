@@ -52,3 +52,35 @@ it("old invitations without reactivation authorization cannot restore a revoked 
  await f.db.update(s.invitations).set({reactivationMembershipId:null}).where(eq(s.invitations.email,a.email));
  await expect(service.acceptInvitation(f.db,a,{token})).rejects.toMatchObject({code:"INVALID_INVITATION"});expect((await membership(m.id)).active).toBe(false);
 });
+it("lists only pending invitations without token material",async()=>{
+ const {a}=await person();const token=await invite(a.email);const result=await service.listPendingInvitations(f.db,family,owner);
+ const entry=result.entries.find(x=>x.email===a.email)!;expect(entry).toBeDefined();expect(entry.reactivation).toBe(true);expect(Object.keys(entry).sort()).toEqual(["id","email","role","expiresAt","createdAt","reactivation"].sort());expect(JSON.stringify(result)).not.toContain(token);
+ await service.acceptInvitation(f.db,a,{token});expect((await service.listPendingInvitations(f.db,family,owner)).entries.some(x=>x.id===entry.id)).toBe(false);
+});
+it("cancellation blocks acceptance, is repeatable and does not activate a member",async()=>{
+ const {a,m}=await person();const token=await invite(a.email);const [inv]=await f.db.select().from(s.invitations).where(eq(s.invitations.email,a.email));
+ await service.cancelInvitation(f.db,family,owner,inv.id,{confirmed:true});await service.cancelInvitation(f.db,family,owner,inv.id,{confirmed:true});
+ await expect(service.acceptInvitation(f.db,a,{token})).rejects.toMatchObject({code:"INVALID_INVITATION"});expect((await membership(m.id)).active).toBe(false);
+ const events=await f.db.select().from(s.auditLogs).where(eq(s.auditLogs.action,`member.invitation.cancelled:${inv.id}`));expect(events).toHaveLength(1);
+});
+it("accepted invitations cannot be cancelled and membership remains active",async()=>{
+ const {a,m}=await person();const token=await invite(a.email);const [inv]=await f.db.select().from(s.invitations).where(eq(s.invitations.email,a.email));await service.acceptInvitation(f.db,a,{token});
+ await expect(service.cancelInvitation(f.db,family,owner,inv.id,{confirmed:true})).rejects.toMatchObject({code:"INVITATION_ACCEPTED"});expect((await membership(m.id)).active).toBe(true);
+});
+it("listing and cancellation enforce owner access, family isolation and confirmation",async()=>{
+ const {a}=await person(true);await f.db.update(s.memberships).set({role:"administrator"}).where(eq(s.memberships.userId,a.id));
+ const t=await person();await invite(t.a.email);const [inv]=await f.db.select().from(s.invitations).where(eq(s.invitations.email,t.a.email));
+ await expect(service.listPendingInvitations(f.db,family,a)).rejects.toMatchObject({code:"FORBIDDEN"});
+ await expect(service.cancelInvitation(f.db,family,a,inv.id,{confirmed:true})).rejects.toMatchObject({code:"FORBIDDEN"});
+ await expect(service.cancelInvitation(f.db,family,owner,inv.id,{confirmed:false})).rejects.toThrow();
+ const other=(await service.createFamily(f.db,owner,{name:"Isolated invitations"})).id;
+ expect((await service.listPendingInvitations(f.db,other,owner)).entries).toHaveLength(0);
+ await expect(service.cancelInvitation(f.db,other,owner,inv.id,{confirmed:true})).rejects.toMatchObject({code:"NOT_FOUND"});
+});
+it("paginates same-timestamp invitations without duplicates and excludes expired entries",async()=>{
+ const id=(await service.createFamily(f.db,owner,{name:"Pagination"})).id;
+ const now=new Date();await f.db.insert(s.invitations).values(Array.from({length:29},(_,i)=>({familyId:id,email:`page${i}@example.test`,role:"member",tokenHash:randomUUID(),createdBy:owner.id,createdAt:now,expiresAt:new Date(Date.now()+(i===28?-1000:3600000))})));
+ const first=await service.listPendingInvitations(f.db,id,owner);expect(first.entries).toHaveLength(25);expect(first.nextCursor).not.toBeNull();
+ const second=await service.listPendingInvitations(f.db,id,owner,first.nextCursor);expect(second.entries).toHaveLength(3);expect(second.nextCursor).toBeNull();expect(new Set([...first.entries,...second.entries].map(x=>x.id)).size).toBe(28);
+ await expect(service.listPendingInvitations(f.db,id,owner,{before:now.toISOString()})).rejects.toThrow();
+});

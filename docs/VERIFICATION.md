@@ -129,3 +129,10 @@ Strict TypeScript passed. Full suite: 145 passed, one stale email-logo expectati
 - Additive migration 0006 is applied by the test database fixture. Production webpack build and TypeScript checks passed.
 - Six Chromium component scenarios passed at 320/390/1024px in English/Bengali: inactive-member Re-invite, email prefill, read-only default, invitation request payload, success notice and horizontal containment. API responses were mocked; no actual invitation was delivered.
 - Physical devices, real provider delivery and concurrent multi-connection Neon transactions were not exercised.
+
+## 0.13.0 — pending invitation management (22 October 2026)
+
+- 199 tests across 20 files passed. Five added cases cover safe pending-list output, cancellation and repeat handling, accepted-membership protection, owner/family/confirmation boundaries, same-timestamp cursor pagination and expiry filtering.
+- Production webpack build including strict TypeScript checks passed.
+- Six Chromium component checks passed at 320/390/1024px in English/Bengali: pending-list rendering, horizontal containment, confirmation, cancellation request and refreshed empty state. Tests use synthetic data and mocked API responses.
+- No actual provider email was sent. Physical mobile devices, live Neon concurrency and deployed integration remain untested here.

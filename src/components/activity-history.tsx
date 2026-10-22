@@ -24,6 +24,8 @@ const actions: Record<string,[string,string]> = {
 };
 function actionLabel(action:string,bn:boolean) {
   const parts=action.split(":");
+  if(parts.length===2 && parts[0]==="member.invitation.cancelled")
+    return `${bn ? "আমন্ত্রণ বাতিল" : "Invitation cancelled"} (${parts[1]})`;
   if(parts.length===4 && parts[0]==="member.role.changed")
     return `${bn ? "সদস্যের ভূমিকা পরিবর্তন" : "Member role changed"}: ${parts[2]} → ${parts[3]} (${parts[1]})`;
   return actions[action]?.[bn?1:0] ?? action;

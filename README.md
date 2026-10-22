@@ -2,9 +2,11 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.12.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.13.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
+
+- Owner-only pending invitation list, expiry display, pagination and confirmed cancellation. See docs/INVITATION-MANAGEMENT.md.
 
 - Re-invitation and consent-based reactivation for revoked/expired members; newest-link-only invitations and cleared stale access. See docs/REINVITATIONS.md.
 

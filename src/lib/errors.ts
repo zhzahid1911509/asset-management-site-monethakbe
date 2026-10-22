@@ -7,6 +7,7 @@ export class AppError extends Error {
   }
 }
 export const safeMessages: Record<string, string> = {
+  INVITATION_ACCEPTED: "This invitation has already been accepted. Manage the member’s access from Family members.",
   MEMBER_ALREADY_ACTIVE: "This person already has active membership. Use Change role instead.",
   MEMBER_CONFLICT: "This member’s role changed. Refresh the member list and review it again.",
   MEMBER_INACTIVE: "Revoked or expired memberships cannot be changed here.",
