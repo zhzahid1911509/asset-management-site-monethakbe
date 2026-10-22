@@ -50,6 +50,13 @@
       "when": 1792596328474,
       "tag": "0006_member_reinvitations",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792685663411,
+      "tag": "0007_optional_document_scanning",
+      "breakpoints": true
     }
   ]
 }

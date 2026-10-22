@@ -1,3 +1,4 @@
+import {ScannerError} from "./malware-scanner";
 import { randomUUID } from "node:crypto";
 import { ZodError } from "zod";
 import { getAuth, configured } from "./auth";
@@ -62,7 +63,7 @@ export async function handle(
     const status = known ? error.status : validation ? 422 : 500;
     if (status >= 500)
       console.error(
-        JSON.stringify({ event: "request.failed", code, correlationId }),
+        JSON.stringify({ event: "request.failed", code, correlationId, ...(error instanceof ScannerError ? {diagnostic:error.diagnostic} : {}) }),
       );
     return Response.json(
       {

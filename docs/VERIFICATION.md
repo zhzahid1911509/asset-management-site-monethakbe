@@ -136,3 +136,11 @@ Strict TypeScript passed. Full suite: 145 passed, one stale email-logo expectati
 - Production webpack build including strict TypeScript checks passed.
 - Six Chromium component checks passed at 320/390/1024px in English/Bengali: pending-list rendering, horizontal containment, confirmation, cancellation request and refreshed empty state. Tests use synthetic data and mocked API responses.
 - No actual provider email was sent. Physical mobile devices, live Neon concurrency and deployed integration remain untested here.
+
+## 0.13.1 — scanner connectivity repair (22 October 2026)
+
+- 210 tests across 21 files passed; strict TypeScript and production webpack build passed.
+- New tests exercise authenticated HTTPS requests, exact-byte digest verification, infected/unknown/malformed responses, bounded response size, auth/network errors, insecure production URLs and malformed TCP settings.
+- Real local HTTP gateway requests verify authorization, clean/infected verdict framing, MIME rejection and scanner-failure handling with an injected synthetic scanner. Existing synthetic TCP tests verify ClamAV INSTREAM framing. Existing document integration tests cover scanner rejection/unavailability and publication behavior.
+- Storage construction no longer requires scanner configuration; tested independently with AWS_REGION fallback. No actual storage/provider network request was made by that check.
+- The Docker Compose/TLS stack, actual ClamAV image/signatures, live Vercel networking and user's deployment were not run or changed. A reachable configured scanner service remains required. No real user file or email was sent to an external service.

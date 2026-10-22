@@ -2,9 +2,13 @@
 
 A runnable **Next.js 16 / React / strict TypeScript** application for the first implementation slice of the family asset platform. Neon PostgreSQL is the production source of truth. No browser-local database, fake balances or simulated provider connections are used.
 
-**Release:** 0.13.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
+**Release:** 0.14.0 — foundation and core record workflows. This is not the complete master specification or a production-security certification.
 
 ## Implemented
+
+- Explicit temporary uploads without a scanner, with persistent unscanned labels. Setup: [docs/UPLOAD-WITHOUT-SCANNER.md](docs/UPLOAD-WITHOUT-SCANNER.md).
+
+- Authenticated HTTPS malware-scanner adapter and deployment bundle; scanner diagnostics. For upload errors, start with docs/SCANNER-SETUP.md.
 
 - Owner-only pending invitation list, expiry display, pagination and confirmed cancellation. See docs/INVITATION-MANAGEMENT.md.
 

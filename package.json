@@ -1,6 +1,6 @@
 {
   "name": "monethakbe",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "private": true,
   "scripts": {
     "dev": "node scripts/dev.mjs --webpack",
@@ -14,7 +14,9 @@
     "worker:email": "tsx scripts/email-worker.ts",
     "dev:web": "next dev --webpack",
     "email:status": "tsx scripts/email-status.ts",
-    "documents:cleanup": "tsx scripts/document-cleanup.ts"
+    "documents:cleanup": "tsx scripts/document-cleanup.ts",
+    "documents:diagnose": "tsx scripts/document-diagnose.ts",
+    "scanner:gateway": "tsx scripts/scanner-gateway.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1152.0",

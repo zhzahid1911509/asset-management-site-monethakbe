@@ -249,7 +249,12 @@ export function RecordDocuments({
             <p className="notice">
               {bn
                 ? "ফাইল আপলোডের জন্য প্রশাসককে স্টোরেজ ও ভাইরাস স্ক্যানার সেটআপ করতে হবে।"
-                : "An administrator must configure private storage and malware scanning to enable uploads."}
+                : "An administrator must configure private storage and the document scan policy to enable uploads."}
+            </p>
+          )}
+          {data.scanMode === "disabled" && (
+            <p className="notice">
+              {bn ? "ম্যালওয়্যার স্ক্যান বন্ধ আছে। নতুন ফাইল স্ক্যান ছাড়াই সংরক্ষিত হবে। শুধু বিশ্বস্ত ফাইল আপলোড ও ডাউনলোড করুন।" : "Malware scanning is disabled. New files are stored without a malware scan. Only upload and download files you trust."}
             </p>
           )}
           <label>
@@ -337,6 +342,7 @@ export function RecordDocuments({
                         v{v.revision} · {v.filename} ·{" "}
                         {(v.size / 1024).toFixed(1)} KB · {v.status}
                       </p>
+                      {v.scanSkipped && <p className="notice">{bn ? "ম্যালওয়্যার স্ক্যান করা হয়নি" : "Not malware-scanned"}</p>}
                       {v.errorCode && <p>{v.errorCode}</p>}
                       {v.status === "available" && r.canExport && (
                         <>
@@ -458,8 +464,8 @@ export function RecordDocuments({
                 </label>
                 <p className="fine-print">
                   {bn
-                    ? "পুরোনো সংস্করণ সংরক্ষিত থাকবে। স্ক্যান শেষ না হওয়া পর্যন্ত অপেক্ষা করুন।"
-                    : "Older versions are retained. Wait for scanning to finish."}
+                    ? "পুরোনো সংস্করণ সংরক্ষিত থাকবে। আপলোড শেষ না হওয়া পর্যন্ত অপেক্ষা করুন।"
+                    : "Older versions are retained. Wait for the upload to finish."}
                 </p>
                 <Button>
                   {busy

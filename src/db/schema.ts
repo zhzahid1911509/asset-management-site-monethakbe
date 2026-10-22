@@ -609,6 +609,7 @@ export const documentVersions = pgTable(
     createdAt: time("created_at").defaultNow().notNull(),
     updatedAt: time("updated_at").defaultNow().notNull(),
     scannedAt: time("scanned_at"),
+    scanSkipped: boolean("scan_skipped").default(false).notNull(),
   },
   (t) => [
     foreignKey({
@@ -625,7 +626,7 @@ export const documentVersions = pgTable(
     ),
     check(
       "document_clean_ck",
-      sql`${t.status} <> 'available' or ${t.scannedAt} is not null`,
+      sql`(${t.status} <> 'available' or ${t.scannedAt} is not null or ${t.scanSkipped}) and not (${t.scanSkipped} and ${t.scannedAt} is not null)`,
     ),
   ],
 );

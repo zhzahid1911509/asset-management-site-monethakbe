@@ -1,0 +1,3 @@
+ALTER TABLE "document_versions" DROP CONSTRAINT "document_clean_ck";--> statement-breakpoint
+ALTER TABLE "document_versions" ADD COLUMN "scan_skipped" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "document_versions" ADD CONSTRAINT "document_clean_ck" CHECK (("document_versions"."status" <> 'available' or "document_versions"."scanned_at" is not null or "document_versions"."scan_skipped") and not ("document_versions"."scan_skipped" and "document_versions"."scanned_at" is not null));

@@ -1,0 +1,35 @@
+services:
+  clamav:
+    image: clamav/clamav:stable
+    restart: unless-stopped
+    volumes:
+      - signatures:/var/lib/clamav
+  gateway:
+    build:
+      context: ../..
+      dockerfile: deploy/scanner/Dockerfile
+    restart: unless-stopped
+    environment:
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: 3310
+      SCANNER_GATEWAY_TOKEN: ${SCANNER_GATEWAY_TOKEN:?Set a random token of at least 32 characters}
+    depends_on:
+      - clamav
+  tls:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      SCAN_DOMAIN: ${SCAN_DOMAIN:?Set the scanner hostname}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - gateway
+volumes:
+  signatures:
+  caddy_data:
+  caddy_config:

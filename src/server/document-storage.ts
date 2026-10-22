@@ -4,9 +4,10 @@ import {
   GetObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
-import { createConnection } from "node:net";
+import {scanDocument,scannerConfigured} from "./malware-scanner";
+export {scanClamAV} from "./malware-scanner";
 import type { Readable } from "node:stream";
-import { once } from "node:events";
+
 import { AppError } from "../lib/errors";
 import { MAX_DOCUMENT_BYTES } from "../lib/documents";
 export interface DocumentIO {
@@ -15,79 +16,33 @@ export interface DocumentIO {
   get(key: string): Promise<Buffer>;
   remove(key: string): Promise<void>;
 }
+export function documentScanMode(): "required" | "disabled" {
+  const mode = process.env.DOCUMENT_SCAN_MODE ?? "required";
+  if (mode !== "required" && mode !== "disabled")
+    throw new AppError("DOCUMENTS_NOT_CONFIGURED", 503);
+  return mode;
+}
 export function documentsConfigured() {
   return Boolean(
     process.env.DOCUMENT_S3_BUCKET &&
-      process.env.DOCUMENT_S3_REGION &&
-      process.env.CLAMAV_HOST,
+      (process.env.DOCUMENT_S3_REGION || process.env.AWS_REGION) &&
+      (documentScanMode() === "disabled" || scannerConfigured()),
   );
-}
-// ClamAV INSTREAM must run on a trusted private network: the protocol has no authentication.
-export async function scanClamAV(bytes: Buffer, host: string, port = 3310) {
-  const socket = createConnection({ host, port });
-  const deadline = setTimeout(
-    () => socket.destroy(new Error("Scanner deadline")),
-    15000,
-  );
-  try {
-    await new Promise<void>((resolve, reject) => {
-      let response = Buffer.alloc(0);
-      socket.on("error", () => reject(new AppError("SCAN_UNAVAILABLE", 503)));
-      socket.on("close", () => reject(new AppError("SCAN_UNAVAILABLE", 503)));
-      socket.on("data", (chunk) => {
-        response = Buffer.concat([response, Buffer.from(chunk)]);
-        if (response.length > 4096)
-          return reject(new AppError("SCAN_UNAVAILABLE", 503));
-        if (!response.includes(0)) return;
-        const verdict = response
-          .subarray(0, response.indexOf(0))
-          .toString("utf8");
-        if (verdict === "stream: OK") resolve();
-        else if (verdict.startsWith("stream: ") && verdict.endsWith(" FOUND"))
-          reject(new AppError("UNSAFE_FILE", 422));
-        else reject(new AppError("SCAN_UNAVAILABLE", 503));
-      });
-      socket.once("connect", () => {
-        void (async () => {
-          const write = async (chunk: Buffer) => {
-            if (!socket.write(chunk)) await once(socket, "drain");
-          };
-          await write(Buffer.from("zINSTREAM\0"));
-          for (let i = 0; i < bytes.length; i += 65536) {
-            const chunk = bytes.subarray(i, i + 65536),
-              size = Buffer.alloc(4);
-            size.writeUInt32BE(chunk.length);
-            await write(size);
-            await write(chunk);
-          }
-          await write(Buffer.alloc(4));
-        })().catch(() => reject(new AppError("SCAN_UNAVAILABLE", 503)));
-      });
-    });
-  } finally {
-    clearTimeout(deadline);
-    socket.destroy();
-  }
 }
 let sharedClient: S3Client | undefined;
 export function documentIO(): DocumentIO {
-  if (!documentsConfigured())
+  if (!process.env.DOCUMENT_S3_BUCKET || !(process.env.DOCUMENT_S3_REGION || process.env.AWS_REGION))
     throw new AppError("DOCUMENTS_NOT_CONFIGURED", 503);
   const bucket = process.env.DOCUMENT_S3_BUCKET!;
   const client = (sharedClient ??= new S3Client({
-    region: process.env.DOCUMENT_S3_REGION!,
-    endpoint: process.env.DOCUMENT_S3_ENDPOINT || undefined,
+    region: process.env.DOCUMENT_S3_REGION || process.env.AWS_REGION,
+    endpoint: process.env.DOCUMENT_S3_ENDPOINT || process.env.AWS_ENDPOINT_URL_S3 || undefined,
     forcePathStyle: process.env.DOCUMENT_S3_PATH_STYLE === "true",
     maxAttempts: 1,
     // Standard AWS credential chain: environment, workload identity, or instance role.
   }));
   return {
-    scan: (bytes) =>
-      scanClamAV(
-        bytes,
-        process.env.CLAMAV_HOST!,
-        Number(process.env.CLAMAV_PORT || 3310),
-      ),
+    scan: scanDocument,
     async put(key, bytes) {
       await client.send(
         new PutObjectCommand({

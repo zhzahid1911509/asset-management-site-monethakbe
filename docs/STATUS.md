@@ -136,3 +136,13 @@ Revoked/expired members can be re-invited and return by accepting a fresh email-
 ## Version 0.13.0
 
 Owners can view pending invitations, inspect expiry in Dhaka time, paginate and cancel unused links. Cancellation uses the invitation transaction lock and records an audit event; accepted invitations cannot be cancelled. No new migration. Supersedes the pending invitation management limitation in the previous release. Ownership transfer/recovery, custom roles, AI, Drive and full backup/restore remain unfinished.
+
+## Version 0.13.1
+
+HTTPS scanner support, authenticated ClamAV gateway plus Docker Compose/TLS bundle, deployment diagnostics and safe scanner failure reasons in request logs. Uploads still require a clean verdict bound to their SHA-256. Scanner configuration is no longer required for retrieving previously scanned files. AWS_REGION and AWS_ENDPOINT_URL_S3 aliases support provider-generated storage settings. No migration. A reachable scanner must be provisioned separately; code changes do not create one on Vercel.
+
+## v0.14.0 — temporary scanner-disabled uploads
+
+Explicit DOCUMENT_SCAN_MODE=disabled allows validated uploads to private storage without calling the scanner. Migration 0007 records scan_skipped separately from scanned_at; the UI and version history disclose unscanned files. Required remains the default and scanner failures never bypass it. Existing unscanned files retain their marker when scanning is re-enabled. See UPLOAD-WITHOUT-SCANNER.md for deployment instructions.
+
+Verification: 212 tests in 21 files passed; TypeScript check and production Webpack build passed. Tests use synthetic embedded PostgreSQL and mocked storage/scanner IO. Live Neon S3 and Vercel were not exercised.

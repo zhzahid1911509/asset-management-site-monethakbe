@@ -692,3 +692,41 @@ it("reserves quota for retained and unfinished versions", async () => {
       .where(eq(s.documentVersions.sha256, "test"));
   }
 });
+
+it("explicit disabled mode stores truthful scan metadata and preserves download permissions", async () => {
+  vi.stubEnv("DOCUMENT_SCAN_MODE", "disabled");
+  const scan = vi.fn(async () => { throw new AppError("SCAN_UNAVAILABLE", 503); });
+  try {
+    const r = await create();
+    const v = await upload(r.id, metadata, randomUUID(), { ...io, scan });
+    expect(scan).not.toHaveBeenCalled();
+    const history = await docs.documentHistory(fixture.db, familyId, owner, r.id, v.documentId);
+    expect(history.versions[0]).toMatchObject({ status: "available", scanSkipped: true, scannedAt: null });
+    const response = await docs.downloadDocument(fixture.db, familyId, owner, r.id, v.versionId, false, io);
+    expect(Buffer.from(await response.arrayBuffer())).toEqual(file.bytes);
+    await expect(docs.downloadDocument(fixture.db, familyId, outsider, r.id, v.versionId, false, io)).rejects.toBeInstanceOf(AppError);
+    vi.stubEnv("DOCUMENT_SCAN_MODE", "required");
+    const unchanged = await docs.documentHistory(fixture.db, familyId, owner, r.id, v.documentId);
+    expect(unchanged.versions[0]).toMatchObject({ scanSkipped: true, scannedAt: null });
+    const next = await create();
+    await expect(upload(next.id, metadata, randomUUID(), { ...io, scan })).rejects.toMatchObject({ code: "SCAN_UNAVAILABLE" });
+    expect(scan).toHaveBeenCalledOnce();
+    await expect(fixture.db.update(s.documentVersions).set({ scannedAt: new Date() }).where(eq(s.documentVersions.id,v.versionId))).rejects.toThrow();
+  } finally { vi.unstubAllEnvs(); }
+});
+
+it("disabled mode still needs storage and invalid scan policies cannot upload", async () => {
+  try {
+    vi.stubEnv("DOCUMENT_SCAN_MODE", "disabled");
+    vi.stubEnv("DOCUMENT_S3_BUCKET", "test-bucket");
+    vi.stubEnv("DOCUMENT_S3_REGION", "test-region");
+    vi.stubEnv("DOCUMENT_SCAN_URL", "");
+    vi.stubEnv("CLAMAV_HOST", "");
+    expect(documentsConfigured()).toBe(true);
+    vi.stubEnv("DOCUMENT_S3_BUCKET", "");
+    expect(documentsConfigured()).toBe(false);
+    vi.stubEnv("DOCUMENT_SCAN_MODE", "typo");
+    const r = await create();
+    await expect(upload(r.id)).rejects.toMatchObject({ code: "DOCUMENTS_NOT_CONFIGURED" });
+  } finally { vi.unstubAllEnvs(); }
+});

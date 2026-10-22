@@ -20,6 +20,7 @@ import { validateDocument } from "./document-files";
 import {
   documentIO,
   documentsConfigured,
+  documentScanMode,
   type DocumentIO,
 } from "./document-storage";
 const digest = (input: string | Buffer) =>
@@ -43,6 +44,7 @@ export async function listDocuments(
     .limit(101);
   return {
     configured: documentsConfigured(),
+    scanMode: documentScanMode(),
     documents: documents.slice(0, 100),
     hasMore: documents.length > 100,
   };
@@ -72,6 +74,7 @@ export async function documentHistory(
       errorCode: s.documentVersions.errorCode,
       createdAt: s.documentVersions.createdAt,
       scannedAt: s.documentVersions.scannedAt,
+      scanSkipped: s.documentVersions.scanSkipped,
     })
     .from(s.documentVersions)
     .where(eq(s.documentVersions.documentId, documentId))
@@ -104,6 +107,7 @@ export async function uploadDocument(
   uuid.parse(key);
   const metadata = await validateDocument(file.bytes, file.filename, file.mime);
   const inputHash = digest(JSON.stringify({ recordId, input, metadata }));
+  const scanSkipped = documentScanMode() === "disabled";
   const storage = io ?? documentIO();
   const reserved = await db.transaction(async (q) => {
     const { r } = await authorized(q, familyId, a, recordId, "edit");
@@ -215,7 +219,7 @@ export async function uploadDocument(
           eq(s.documentVersions.status, "pending"),
         ),
       );
-    await storage.scan(file.bytes);
+    if (!scanSkipped) await storage.scan(file.bytes);
     // Fail expired requests before starting storage, and again before publication.
     if (Date.now() - v.createdAt.getTime() > 120000)
       throw new AppError("UPLOAD_FAILED", 409);
@@ -254,7 +258,8 @@ export async function uploadDocument(
         .update(s.documentVersions)
         .set({
           status: "available",
-          scannedAt: new Date(),
+          scannedAt: scanSkipped ? null : new Date(),
+          scanSkipped,
           updatedAt: new Date(),
         })
         .where(eq(s.documentVersions.id, v.id));
@@ -367,7 +372,7 @@ export async function downloadDocument(
         eq(s.documentVersions.status, "available"),
       ),
     );
-  if (!v || !v.scannedAt) throw new AppError("NOT_FOUND", 404);
+  if (!v || (!v.scannedAt && !v.scanSkipped)) throw new AppError("NOT_FOUND", 404);
   if (preview && !["image/png", "image/jpeg"].includes(v.mime))
     throw new AppError("INVALID_FILE", 422);
   let bytes: Buffer;
@@ -418,6 +423,7 @@ export async function cleanupDocuments(db: Db, apply = false, io?: DocumentIO) {
     )
     .limit(100);
   if (!apply) return { candidates: candidates.map((v) => v.id), removed: 0 };
+  const scanSkipped = documentScanMode() === "disabled";
   const storage = io ?? documentIO();
   let removed = 0;
   for (const v of candidates) {

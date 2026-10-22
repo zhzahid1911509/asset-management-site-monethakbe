@@ -14,12 +14,12 @@ export const safeMessages: Record<string, string> = {
   HISTORY_EXPORT_LIMIT: "This history exceeds 1,000 rows in a section or the 4 MiB download limit. No partial file was exported.",
   REPORT_LIMIT: "This report exceeds the 5,000-record limit. No partial export was produced.",
   DOCUMENTS_NOT_CONFIGURED:
-    "Document storage and scanning need administrator setup.",
+    "Document storage or scan policy needs administrator setup.",
   INVALID_FILE:
     "Use a matching PDF, PNG, JPEG, UTF-8 TXT or CSV file, up to 10 MB.",
   UNSAFE_FILE: "The scanner rejected this file. It was not made available.",
   SCAN_UNAVAILABLE:
-    "The malware scanner is unavailable. Upload was blocked; please try again later.",
+    "The malware scanner could not be reached or did not return a valid result. Upload was blocked. Ask the administrator to run npm run documents:diagnose and check the reference in server logs.",
   DOCUMENT_UNAVAILABLE:
     "The document service could not complete the request. Reload before retrying.",
   UPLOAD_BUSY: "This upload is still pending. Reload to check its status.",
