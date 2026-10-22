@@ -146,3 +146,7 @@ HTTPS scanner support, authenticated ClamAV gateway plus Docker Compose/TLS bund
 Explicit DOCUMENT_SCAN_MODE=disabled allows validated uploads to private storage without calling the scanner. Migration 0007 records scan_skipped separately from scanned_at; the UI and version history disclose unscanned files. Required remains the default and scanner failures never bypass it. Existing unscanned files retain their marker when scanning is re-enabled. See UPLOAD-WITHOUT-SCANNER.md for deployment instructions.
 
 Verification: 212 tests in 21 files passed; TypeScript check and production Webpack build passed. Tests use synthetic embedded PostgreSQL and mocked storage/scanner IO. Live Neon S3 and Vercel were not exercised.
+
+## v0.14.1 — document form React keys
+
+The selected document panel and upload form now have distinct prefixed keys. This resolves duplicate-key warnings while retaining form remount/reset when the selection changes. No migration or environment change beyond v0.14.0.
